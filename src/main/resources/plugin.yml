@@ -1,0 +1,27 @@
+name: SmsServerUtils
+version: @version@
+main: uwu.smsgamer.smsserverutils.Loader
+softdepend: [ ProtocolLib, PlaceholderAPI ]
+authors: [ Sms_Gamer_3808 ]
+description: A ton of utilities for server operators.
+commands:
+  python-execute:
+    description: Execute python command(s). Will automatically abort if taking too long.
+    usage: /<label> <python command>
+    aliases:
+      - python_execute
+      - py-execute
+      - py_execute
+      - python-exec
+      - python_exec
+      - py-exec
+      - py_exec
+      - pythonexecute
+      - pyexecute
+      - pyexecute
+      - pythonexec
+      - pythonexec
+      - pyexec
+      - pyexec
+      - exec
+      - pyex
