@@ -2,24 +2,16 @@ package uwu.smsgamer.smsserverutils.evaluator;
 
 import java.util.*;
 
-public class EvalOperatorToken extends EvalToken {
+public class EvalOperatorToken {
     public final String stringMatch;
     public final int argNum;
 
-    public EvalOperatorToken(String stringMatch, int nestingLevel) {
-        super(nestingLevel);
-        this.stringMatch = stringMatch;
-        this.argNum = -1;
-    }
-
     public EvalOperatorToken(String stringMatch) {
-        super(0);
         this.stringMatch = stringMatch;
         this.argNum = -1;
     }
 
     public EvalOperatorToken(int argNum) {
-        super(0);
         this.stringMatch = "";
         this.argNum = argNum;
     }
@@ -51,7 +43,6 @@ public class EvalOperatorToken extends EvalToken {
         return "EvalOperatorToken{" +
           "stringMatch='" + stringMatch + '\'' +
           ", argNum=" + argNum +
-          ", nestingLevel=" + nestingLevel +
           "}\n";
     }
 }

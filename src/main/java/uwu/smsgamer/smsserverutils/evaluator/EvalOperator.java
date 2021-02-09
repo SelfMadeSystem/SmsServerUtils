@@ -3,8 +3,6 @@ package uwu.smsgamer.smsserverutils.evaluator;
 import org.jetbrains.annotations.NotNull;
 import uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType;
 
-import java.util.Arrays;
-
 import static uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType.*;
 
 public class EvalOperator extends EvalToken implements Comparable<EvalOperator> {
@@ -21,6 +19,14 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
         if (c == 0) c = Integer.compare(this.type.priority, o.type.priority);
         if (c == 0) return -1;
         return c;
+    }
+
+    @Override
+    public String toString() {
+        return "EvalOperator{" +
+          "type=" + type +
+          ", nestingLevel=" + nestingLevel +
+          "}\n";
     }
 
     public enum FunType {
@@ -72,6 +78,7 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
 
         public final Fun fun;
         public final String format;
+        public final String keyword;
         public final EvalOperatorToken[] tokens;
         public final int priority;
         public final VarType returnType;
@@ -80,6 +87,7 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
         FunType(Fun fun, String format, VarType returnType, VarType... inputTypes) {
             this.fun = fun;
             this.format = format;
+            this.keyword = format.replace(" ", "").replace("%", "");
             this.priority = Integer.MAX_VALUE;
             this.returnType = returnType;
             this.inputTypes = inputTypes;
@@ -89,10 +97,18 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
         FunType(Fun fun, String format, int priority, VarType returnType, VarType... inputTypes) {
             this.fun = fun;
             this.format = format;
+            this.keyword = format.replace(" ", "").replace("%", "");
             this.priority = priority;
             this.returnType = returnType;
             this.inputTypes = inputTypes;
             this.tokens = EvalOperatorToken.getTokensForOperator(format);
+        }
+
+        public static FunType getFunType(String keyword) {
+            for (FunType value : values()) {
+                if (value.keyword.equals(keyword)) return value;
+            }
+            return null;
         }
     }
 

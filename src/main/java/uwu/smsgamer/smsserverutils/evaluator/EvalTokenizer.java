@@ -58,6 +58,19 @@ public class EvalTokenizer {
         }
     }
 
+    public void parseToFuns() {
+        for (int i = 0; i < tokens.size(); i++) {
+            EvalToken token = tokens.get(i);
+            if (token.getClass() == EvalVar.Unknown.class) {
+                EvalVar.Unknown opToken = (EvalVar.Unknown) token;
+                EvalOperator.FunType type = EvalOperator.FunType.getFunType(opToken.name);
+                if (type != null) {
+                    tokens.set(i, new EvalOperator(token.nestingLevel, type));
+                }
+            }
+        }
+    }
+
     private void getNextToken(char current) {
         StringBuilder buf = new StringBuilder(String.valueOf(current));
         W:
@@ -122,6 +135,8 @@ public class EvalTokenizer {
         tokenizer.tokenize();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToVars();
+        System.out.println(tokenizer.tokens);
+        tokenizer.parseToFuns();
         System.out.println(tokenizer.tokens);
     }
 }
