@@ -1,18 +1,25 @@
 package uwu.smsgamer.smsserverutils.evaluator;
 
+import org.jetbrains.annotations.NotNull;
 import uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType;
-
-import java.util.List;
 
 import static uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType.*;
 
-public class EvalOperator {
-    public final List<EvalVar<?>> params;
+public class EvalOperator implements Comparable<EvalOperator> {
+    public final int nestingLevel;
     public final FunType type;
 
-    public EvalOperator(List<EvalVar<?>> params, FunType type) {
-        this.params = params;
+    public EvalOperator(int nestingLevel, FunType type) {
+        this.nestingLevel = nestingLevel;
         this.type = type;
+    }
+
+    @Override
+    public int compareTo(@NotNull EvalOperator o) {
+        int c = Integer.compare(this.nestingLevel, o.nestingLevel);
+        if (c == 0) c = Integer.compare(this.type.priority, o.type.priority);
+        if (c == 0) return -1;
+        return c;
     }
 
     public enum FunType {
