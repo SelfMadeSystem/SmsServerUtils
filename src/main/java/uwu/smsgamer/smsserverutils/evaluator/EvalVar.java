@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 @Getter
-public class EvalVar<T> extends EvalToken {
+public abstract class EvalVar<T> extends EvalToken {
     public String name;
     @Nullable public T value;
     public final VarType type;
@@ -39,13 +39,7 @@ public class EvalVar<T> extends EvalToken {
         this.type = type;
     }
 
-    public Number number() {
-        if (value instanceof Number) {
-            return (Number) value;
-        } else if (value instanceof CharSequence) {
-            return Double.valueOf(value.toString());
-        } else return 0;
-    }
+    public abstract Number number();
 
     public int i() {
         return number().intValue();
@@ -63,11 +57,7 @@ public class EvalVar<T> extends EvalToken {
         return string();
     }
 
-    public boolean bool() {
-        if (value instanceof Number) return number().doubleValue() == 0D;
-        if (value instanceof String) return ((String) value).isEmpty();
-        return false;
-    }
+    public abstract boolean bool();
 
     @Override
     public EvalVar<?> toVar() {
@@ -103,6 +93,18 @@ public class EvalVar<T> extends EvalToken {
               ", nestingLevel=" + nestingLevel +
               "}\n";
         }
+
+        @Override
+        public Number number() {
+            if (value == null) return 0;
+            return Double.parseDouble(value);
+        }
+
+        @Override
+        public boolean bool() {
+            if (value == null) return false;
+            return !value.isEmpty();
+        }
     }
 
     public static class Num extends EvalVar<Number> {
@@ -126,6 +128,16 @@ public class EvalVar<T> extends EvalToken {
               ", value=" + value +
               ", nestingLevel=" + nestingLevel +
               "}\n";
+        }
+
+        @Override
+        public Number number() {
+            return value == null ? 0 : value;
+        }
+
+        @Override
+        public boolean bool() {
+            return i() != 0;
         }
     }
 
@@ -151,6 +163,16 @@ public class EvalVar<T> extends EvalToken {
               ", nestingLevel=" + nestingLevel +
               "}\n";
         }
+
+        @Override
+        public Number number() {
+            return Boolean.TRUE.equals(value) ? 1 : 0;
+        }
+
+        @Override
+        public boolean bool() {
+            return Boolean.TRUE.equals(value);
+        }
     }
 
     public static class Unknown extends EvalToken {
@@ -171,7 +193,7 @@ public class EvalVar<T> extends EvalToken {
 
         @Override
         public EvalVar<?> toVar() {
-            return null;
+            return null; // todo
         }
     }
 }

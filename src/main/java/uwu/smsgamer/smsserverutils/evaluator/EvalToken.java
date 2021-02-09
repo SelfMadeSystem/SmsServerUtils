@@ -1,7 +1,7 @@
 package uwu.smsgamer.smsserverutils.evaluator;
 
 public abstract class EvalToken {
-    public final int nestingLevel;
+    public int nestingLevel;
 
     protected EvalToken(int nestingLevel) {
         this.nestingLevel = nestingLevel;
