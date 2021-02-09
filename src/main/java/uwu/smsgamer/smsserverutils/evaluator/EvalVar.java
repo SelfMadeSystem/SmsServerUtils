@@ -60,7 +60,7 @@ public abstract class EvalVar<T> extends EvalToken {
     public abstract boolean bool();
 
     @Override
-    public EvalVar<?> toVar() {
+    public EvalVar<?> toVar(Evaluator ev) {
         return this;
     }
 
@@ -192,8 +192,8 @@ public abstract class EvalVar<T> extends EvalToken {
         }
 
         @Override
-        public EvalVar<?> toVar() {
-            return null; // todo
+        public EvalVar<?> toVar(Evaluator ev) {
+            return ev == null ? null : ev.varMap.get(name);
         }
     }
 }

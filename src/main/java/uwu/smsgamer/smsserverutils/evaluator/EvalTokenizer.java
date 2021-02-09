@@ -14,7 +14,7 @@ public class EvalTokenizer {
         this.stop = charArr.length;
     }
 
-    public void tokenize() {
+    public EvalTokenizer tokenize() {
         W:
         while (shouldContinue()) {
             char c = next();
@@ -22,6 +22,9 @@ public class EvalTokenizer {
             switch (c) {
                 case '"':
                     getStringToken();
+                    continue W;
+                case '#':
+                    skipComment();
                     continue W;
                 case '(':
                     nest++;
@@ -34,9 +37,10 @@ public class EvalTokenizer {
             }
             getNextToken(c);
         }
+        return this;
     }
 
-    public void parseToVars() {
+    public EvalTokenizer parseToVars() {
         for (int i = 0; i < tokens.size(); i++) {
             EvalToken token = tokens.get(i);
             if (token.getClass() == EvalVar.Unknown.class) {
@@ -58,9 +62,10 @@ public class EvalTokenizer {
                 }
             }
         }
+        return this;
     }
 
-    public void parseToFuns() {
+    public EvalTokenizer parseToFuns() {
         for (int i = 0; i < tokens.size(); i++) {
             EvalToken token = tokens.get(i);
             if (token.getClass() == EvalVar.Unknown.class) {
@@ -71,15 +76,21 @@ public class EvalTokenizer {
                 }
             }
         }
+        return this;
     }
 
-    public void sortFuns() {
+    public EvalTokenizer sortFuns() {
         float lastSize = tokens.size() + 1;
         while (tokens.size() > 1) {
             toFunsRound();
             if (lastSize == tokens.size()) throw new RuntimeException("Loop or invalid tokens.");
             lastSize = tokens.size();
         }
+        return this;
+    }
+
+    private void skipComment() {
+        while (shouldContinue()) if (next() == '#') break;
     }
 
     private float getHighestNestingLevel() {
@@ -111,6 +122,7 @@ public class EvalTokenizer {
                 break;
             }
         }
+        //noinspection StatementWithEmptyBody
         while (tokens.remove(null));
     }
 
@@ -122,6 +134,7 @@ public class EvalTokenizer {
             char c = next();
             if (Character.isWhitespace(c)) break;
             switch (c) {
+                case '#':
                 case '"':
                 case '(':
                 case ')':
@@ -175,18 +188,5 @@ public class EvalTokenizer {
 
     private boolean shouldContinue() {
         return at < stop;
-    }
-
-    public static void main(String[] args) {
-        EvalTokenizer tokenizer = new EvalTokenizer("fisqrt 4"); // fixme
-        tokenizer.tokenize();
-        System.out.println(tokenizer.tokens);
-        tokenizer.parseToVars();
-        System.out.println(tokenizer.tokens);
-        tokenizer.parseToFuns();
-        System.out.println(tokenizer.tokens);
-        tokenizer.sortFuns();
-        System.out.println(tokenizer.tokens);
-        System.out.println(tokenizer.tokens.get(0).toVar().value);
     }
 }

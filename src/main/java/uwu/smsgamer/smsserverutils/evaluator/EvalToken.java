@@ -7,5 +7,5 @@ public abstract class EvalToken {
         this.nestingLevel = nestingLevel;
     }
 
-    public abstract EvalVar<?> toVar();
+    public abstract EvalVar<?> toVar(Evaluator ev);
 }
