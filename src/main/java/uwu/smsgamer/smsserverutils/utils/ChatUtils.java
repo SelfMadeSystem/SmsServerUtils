@@ -1,13 +1,10 @@
 package uwu.smsgamer.smsserverutils.utils;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 import uwu.smsgamer.senapi.utils.StringUtils;
 import uwu.smsgamer.smsserverutils.config.ConfVal;
-
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class ChatUtils {
