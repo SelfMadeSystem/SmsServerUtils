@@ -7,12 +7,11 @@ import java.util.Arrays;
 
 import static uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType.*;
 
-public class EvalOperator implements Comparable<EvalOperator> {
-    public final int nestingLevel;
+public class EvalOperator extends EvalToken implements Comparable<EvalOperator> {
     public final FunType type;
 
     public EvalOperator(int nestingLevel, FunType type) {
-        this.nestingLevel = nestingLevel;
+        super(nestingLevel);
         this.type = type;
     }
 
@@ -73,7 +72,7 @@ public class EvalOperator implements Comparable<EvalOperator> {
 
         public final Fun fun;
         public final String format;
-        public final EvalToken[] tokens;
+        public final EvalOperatorToken[] tokens;
         public final int priority;
         public final VarType returnType;
         public final VarType[] inputTypes;
@@ -84,7 +83,7 @@ public class EvalOperator implements Comparable<EvalOperator> {
             this.priority = Integer.MAX_VALUE;
             this.returnType = returnType;
             this.inputTypes = inputTypes;
-            this.tokens = EvalToken.getTokensForOperator(format);
+            this.tokens = EvalOperatorToken.getTokensForOperator(format);
         }
 
         FunType(Fun fun, String format, int priority, VarType returnType, VarType... inputTypes) {
@@ -93,15 +92,11 @@ public class EvalOperator implements Comparable<EvalOperator> {
             this.priority = priority;
             this.returnType = returnType;
             this.inputTypes = inputTypes;
-            this.tokens = EvalToken.getTokensForOperator(format);
+            this.tokens = EvalOperatorToken.getTokensForOperator(format);
         }
     }
 
     public interface Fun {
         EvalVar<?> run(EvalVar<?>... vars);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(Arrays.toString(FunType.AND.tokens));
     }
 }
