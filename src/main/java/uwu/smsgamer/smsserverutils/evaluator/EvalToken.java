@@ -6,4 +6,6 @@ public abstract class EvalToken {
     protected EvalToken(int nestingLevel) {
         this.nestingLevel = nestingLevel;
     }
+
+    public abstract EvalVar<?> toVar();
 }

@@ -7,6 +7,7 @@ import static uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType.*;
 
 public class EvalOperator extends EvalToken implements Comparable<EvalOperator> {
     public final FunType type;
+    public EvalToken[] args;
 
     public EvalOperator(int nestingLevel, FunType type) {
         super(nestingLevel);
@@ -27,6 +28,17 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
           "type=" + type +
           ", nestingLevel=" + nestingLevel +
           "}\n";
+    }
+
+    public EvalVar<?> execute() {
+        EvalVar<?>[] vars = new EvalVar[args.length];
+        for (int i = 0; i < args.length; i++) vars[i] = args[i].toVar();
+        return type.fun.run(vars);
+    }
+
+    @Override
+    public EvalVar<?> toVar() {
+        return execute();
     }
 
     public enum FunType {
@@ -113,6 +125,6 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
     }
 
     public interface Fun {
-        EvalVar<?> run(EvalVar<?>... vars);
+        EvalVar<?> run(EvalVar<?>... args);
     }
 }

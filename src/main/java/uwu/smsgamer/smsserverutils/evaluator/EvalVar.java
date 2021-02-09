@@ -69,6 +69,11 @@ public class EvalVar<T> extends EvalToken {
         return false;
     }
 
+    @Override
+    public EvalVar<?> toVar() {
+        return this;
+    }
+
     public enum VarType {
         STRING,
         NUMBER,
@@ -162,6 +167,11 @@ public class EvalVar<T> extends EvalToken {
               "name='" + name + '\'' +
               ", nestingLevel=" + nestingLevel +
               "}\n";
+        }
+
+        @Override
+        public EvalVar<?> toVar() {
+            return null;
         }
     }
 }
