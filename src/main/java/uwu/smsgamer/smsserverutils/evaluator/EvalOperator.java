@@ -54,6 +54,7 @@ public class EvalOperator extends EvalToken {
         DIV((v) -> new EvalVar.Num(v[0].d() / v[1].d()), "% / %", 0.2, NUMBER, NUMBER, NUMBER),
         POW((v) -> new EvalVar.Num(Math.pow(v[0].d(), v[1].d())), "% ^ %", 0.3, NUMBER, NUMBER, NUMBER),
         SQRT((v) -> new EvalVar.Num(Math.sqrt(v[0].d())), "sqrt %", NUMBER, NUMBER),
+        ISQRT((v) -> new EvalVar.Num(1 / Math.sqrt(v[0].d())), "isqrt %", NUMBER, NUMBER),
         ROOT((v) -> new EvalVar.Num(Math.pow(v[0].d(), 1 / v[1].d())), "root % %", NUMBER, NUMBER, NUMBER),
         MAX((v) -> new EvalVar.Num(Math.max(v[0].d(), v[1].d())), "max % %", NUMBER, NUMBER, NUMBER),
         MIN((v) -> new EvalVar.Num(Math.min(v[0].d(), v[1].d())), "min % %", NUMBER, NUMBER, NUMBER),

@@ -178,7 +178,7 @@ public class EvalTokenizer {
     }
 
     public static void main(String[] args) {
-        EvalTokenizer tokenizer = new EvalTokenizer("x == 3"); // fixme
+        EvalTokenizer tokenizer = new EvalTokenizer("fisqrt 4"); // fixme
         tokenizer.tokenize();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToVars();
