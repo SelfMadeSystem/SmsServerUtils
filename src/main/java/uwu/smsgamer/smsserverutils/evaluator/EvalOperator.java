@@ -3,6 +3,8 @@ package uwu.smsgamer.smsserverutils.evaluator;
 import org.jetbrains.annotations.NotNull;
 import uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType;
 
+import java.util.regex.Pattern;
+
 import static uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType.*;
 
 public class EvalOperator extends EvalToken implements Comparable<EvalOperator> {
@@ -91,6 +93,8 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
         public final Fun fun;
         public final String format;
         public final String keyword;
+        public final int argsBefore;
+        public final int argsAfter;
         public final EvalOperatorToken[] tokens;
         public final int priority;
         public final VarType returnType;
@@ -100,6 +104,17 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
             this.fun = fun;
             this.format = format;
             this.keyword = format.replace(" ", "").replace("%", "");
+            String[] split = this.format.split(Pattern.quote(this.keyword));
+            if (split.length == 0) {
+                this.argsBefore = 0;
+                this.argsAfter = 0;
+            } else if (split.length == 1) {
+                this.argsBefore = (int) split[0].chars().filter(c -> c == '%').count();
+                this.argsAfter = 0;
+            } else {
+                this.argsBefore = (int) split[0].chars().filter(c -> c == '%').count();
+                this.argsAfter = (int) split[1].chars().filter(c -> c == '%').count();
+            }
             this.priority = Integer.MAX_VALUE;
             this.returnType = returnType;
             this.inputTypes = inputTypes;
@@ -110,6 +125,17 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
             this.fun = fun;
             this.format = format;
             this.keyword = format.replace(" ", "").replace("%", "");
+            String[] split = this.format.split(Pattern.quote(this.keyword));
+            if (split.length == 0) {
+                this.argsBefore = 0;
+                this.argsAfter = 0;
+            } else if (split.length == 1) {
+                this.argsBefore = (int) split[0].chars().filter(c -> c == '%').count();
+                this.argsAfter = 0;
+            } else {
+                this.argsBefore = (int) split[0].chars().filter(c -> c == '%').count();
+                this.argsAfter = (int) split[1].chars().filter(c -> c == '%').count();
+            }
             this.priority = priority;
             this.returnType = returnType;
             this.inputTypes = inputTypes;

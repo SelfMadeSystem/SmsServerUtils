@@ -131,7 +131,7 @@ public class EvalTokenizer {
     }
 
     public static void main(String[] args) {
-        EvalTokenizer tokenizer = new EvalTokenizer("3 + (6 - (7 * 3)) > true");
+        EvalTokenizer tokenizer = new EvalTokenizer("0xA + (6 - (7 * 3)) > true");
         tokenizer.tokenize();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToVars();
