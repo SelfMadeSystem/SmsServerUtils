@@ -34,13 +34,6 @@ public final class SmsServerUtils {
         }
 
         try {
-            Class.forName("uwu.smsgamer.senapi.ConsolePlayer", true, this.getClass().getClassLoader());
-            System.out.println("==================Found ConsolePlayer==================");
-        } catch (ClassNotFoundException e) {
-            System.out.println("==================Did not find ConsolePlayer==================");
-        }
-
-        try {
             Class.forName("org.python.Version", true, this.getClass().getClassLoader());
             System.out.println("==================Found Jython==================");
         } catch (ClassNotFoundException e) {

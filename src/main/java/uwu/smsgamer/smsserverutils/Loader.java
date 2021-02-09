@@ -20,11 +20,11 @@ public class Loader extends JavaPlugin {
         final Lilliputian lilliputian = new Lilliputian(this);
         lilliputian.getDependencyBuilder()
           .addDependency(new Dependency(Repository.JITPACK,
-            "com.github.True-cc", "SenAPI", "0.2.3-rc1"))
-          .addDependency(new Dependency(Repository.JITPACK,
             "com.github.retrooper", "packetevents", "v1.8-pre-3"))
           .addDependency(new Dependency(Repository.MAVENCENTRAL,
-            "org.python", "jython-slim", "2.7.2"))
+            "org.python", "jython-standalone", "2.7.2"))
+          .addDependency(new Dependency(Repository.MAVENCENTRAL,
+            "org.xerial", "sqlite-jdbc", "3.8.11.2"))
           .loadDependencies();
 
         SmsServerUtils.getInstance().onLoad();
