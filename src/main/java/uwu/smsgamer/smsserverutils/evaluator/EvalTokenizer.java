@@ -59,6 +59,7 @@ public class EvalTokenizer {
     }
 
     public void parseToFuns() {
+        int highest = getHighestNestingLevel();
         for (int i = 0; i < tokens.size(); i++) {
             EvalToken token = tokens.get(i);
             if (token.getClass() == EvalVar.Unknown.class) {
@@ -69,6 +70,41 @@ public class EvalTokenizer {
                 }
             }
         }
+    }
+
+    public void sortFuns() {
+        while (tokens.size() > 1) toFunsRound();
+    }
+
+    private int getHighestNestingLevel() {
+        int max = -1;
+        for (EvalToken token : tokens) max = Math.max(token.nestingLevel, max);
+        return max;
+    }
+
+    private void toFunsRound() {
+        int highest = getHighestNestingLevel();
+        for (int i = 0; i < tokens.size(); i++) {
+            EvalToken token = tokens.get(i);
+            if (token == null) {
+                continue;
+            }
+            if (token.getClass() == EvalOperator.class) {
+                if (token.nestingLevel != highest) continue;
+                token.nestingLevel--;
+                EvalOperator op = (EvalOperator) token;
+                op.args = new EvalToken[op.type.argsBefore + op.type.argsAfter];
+                int k = 0;
+                for (int j = -op.type.argsBefore; j <= op.type.argsAfter; j++) {
+                    if (j == 0) continue;
+                    op.args[k] = tokens.get(i + j);
+                    tokens.set(i + j, null);
+                    k++;
+                }
+                break;
+            }
+        }
+        while (tokens.remove(null));
     }
 
     private void getNextToken(char current) {
@@ -131,12 +167,15 @@ public class EvalTokenizer {
     }
 
     public static void main(String[] args) {
-        EvalTokenizer tokenizer = new EvalTokenizer("0xA + (6 - (7 * 3)) > true");
+        EvalTokenizer tokenizer = new EvalTokenizer("0xA + (6 - (7 * 3))");
         tokenizer.tokenize();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToVars();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToFuns();
         System.out.println(tokenizer.tokens);
+        tokenizer.sortFuns();
+        System.out.println(tokenizer.tokens);
+        System.out.println(tokenizer.tokens.get(0).toVar());
     }
 }
