@@ -29,6 +29,8 @@ public class EvalTokenizer {
                 case ')':
                     nest--;
                     continue W;
+                case '.':
+                    continue W;
             }
             getNextToken(c);
         }
@@ -59,7 +61,6 @@ public class EvalTokenizer {
     }
 
     public void parseToFuns() {
-        int highest = getHighestNestingLevel();
         for (int i = 0; i < tokens.size(); i++) {
             EvalToken token = tokens.get(i);
             if (token.getClass() == EvalVar.Unknown.class) {
@@ -78,7 +79,7 @@ public class EvalTokenizer {
 
     private int getHighestNestingLevel() {
         int max = -1;
-        for (EvalToken token : tokens) max = Math.max(token.nestingLevel, max);
+        for (EvalToken token : tokens) if (token.getClass() == EvalOperator.class) max = Math.max(token.nestingLevel, max);
         return max;
     }
 
@@ -118,6 +119,7 @@ public class EvalTokenizer {
                 case '(':
                 case ')':
                     at--;
+                case '.':
                     break W;
             }
             buf.append(c);
@@ -167,7 +169,7 @@ public class EvalTokenizer {
     }
 
     public static void main(String[] args) {
-        EvalTokenizer tokenizer = new EvalTokenizer("0xA + (6 - (7 * 3))");
+        EvalTokenizer tokenizer = new EvalTokenizer("(2 ^ 5) > (2 ^ 5)"); // fixme
         tokenizer.tokenize();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToVars();
@@ -176,6 +178,6 @@ public class EvalTokenizer {
         System.out.println(tokenizer.tokens);
         tokenizer.sortFuns();
         System.out.println(tokenizer.tokens);
-        System.out.println(tokenizer.tokens.get(0).toVar());
+        System.out.println(tokenizer.tokens.get(0).toVar().value);
     }
 }
