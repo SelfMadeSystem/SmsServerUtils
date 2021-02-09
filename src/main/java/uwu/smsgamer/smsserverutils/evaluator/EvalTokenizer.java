@@ -77,23 +77,24 @@ public class EvalTokenizer {
         while (tokens.size() > 1) toFunsRound();
     }
 
-    private int getHighestNestingLevel() {
-        int max = -1;
-        for (EvalToken token : tokens) if (token.getClass() == EvalOperator.class) max = Math.max(token.nestingLevel, max);
+    private float getHighestNestingLevel() {
+        float max = -1;
+        for (EvalToken token : tokens) if (token.getClass() == EvalOperator.class) max = Math.max(((EvalOperator) token).priority(), max);
         return max;
     }
 
     private void toFunsRound() {
-        int highest = getHighestNestingLevel();
+        float highest = getHighestNestingLevel();
         for (int i = 0; i < tokens.size(); i++) {
             EvalToken token = tokens.get(i);
             if (token == null) {
                 continue;
             }
             if (token.getClass() == EvalOperator.class) {
-                if (token.nestingLevel != highest) continue;
-                token.nestingLevel--;
                 EvalOperator op = (EvalOperator) token;
+                if (op.priority() != highest) continue;
+                if (op.args != null) continue;
+                token.nestingLevel--;
                 op.args = new EvalToken[op.type.argsBefore + op.type.argsAfter];
                 int k = 0;
                 for (int j = -op.type.argsBefore; j <= op.type.argsAfter; j++) {
@@ -169,7 +170,7 @@ public class EvalTokenizer {
     }
 
     public static void main(String[] args) {
-        EvalTokenizer tokenizer = new EvalTokenizer("(2 ^ 5) > (2 ^ 5)"); // fixme
+        EvalTokenizer tokenizer = new EvalTokenizer("(1 + 2 * 3) - ((1 + 2) * 3) s+ ((1 + 2) * 3) - (1 + 2 * 3)"); // fixme
         tokenizer.tokenize();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToVars();

@@ -1,27 +1,18 @@
 package uwu.smsgamer.smsserverutils.evaluator;
 
-import org.jetbrains.annotations.NotNull;
 import uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType;
 
 import java.util.regex.Pattern;
 
 import static uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType.*;
 
-public class EvalOperator extends EvalToken implements Comparable<EvalOperator> {
+public class EvalOperator extends EvalToken {
     public final FunType type;
     public EvalToken[] args;
 
     public EvalOperator(int nestingLevel, FunType type) {
         super(nestingLevel);
         this.type = type;
-    }
-
-    @Override
-    public int compareTo(@NotNull EvalOperator o) {
-        int c = Integer.compare(this.nestingLevel, o.nestingLevel);
-        if (c == 0) c = Integer.compare(this.type.priority, o.type.priority);
-        if (c == 0) return -1;
-        return c;
     }
 
     @Override
@@ -43,21 +34,25 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
         return execute();
     }
 
+    public float priority() {
+        return nestingLevel + (args == null ? type.priority : 0);
+    }
+
     public enum FunType {
         // Boolean operators
-        NOT((v) -> new EvalVar.Bool(!v[0].bool()), "! %", 16, BOOLEAN, BOOLEAN),
-        AND((v) -> new EvalVar.Bool(v[0].bool() && v[1].bool()), "% && %", 48, BOOLEAN, BOOLEAN, BOOLEAN),
-        OR((v) -> new EvalVar.Bool(v[0].bool() || v[1].bool()), "% || %", 32, BOOLEAN, BOOLEAN, BOOLEAN),
-        XOR((v) -> new EvalVar.Bool(v[0].bool() == v[1].bool()), "% ^^ %", 32, BOOLEAN, BOOLEAN, BOOLEAN),
-        NOR((v) -> NOT.run(OR.run(v)), "% !| %", 32, BOOLEAN, BOOLEAN, BOOLEAN),
-        XNOR((v) -> NOT.run(XOR.run(v)), "% !^ %", 32, BOOLEAN, BOOLEAN, BOOLEAN),
-        NAND((v) -> NOT.run(AND.run(v)), "% !& %", 48, BOOLEAN, BOOLEAN, BOOLEAN),
+        NOT((v) -> new EvalVar.Bool(!v[0].bool()), "! %", 0.9, BOOLEAN, BOOLEAN),
+        AND((v) -> new EvalVar.Bool(v[0].bool() && v[1].bool()), "% && %", 0.5, BOOLEAN, BOOLEAN, BOOLEAN),
+        OR((v) -> new EvalVar.Bool(v[0].bool() || v[1].bool()), "% || %", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        XOR((v) -> new EvalVar.Bool(v[0].bool() == v[1].bool()), "% ^^ %", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        NOR((v) -> NOT.run(OR.run(v)), "% !| %", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        XNOR((v) -> NOT.run(XOR.run(v)), "% !^ %", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        NAND((v) -> NOT.run(AND.run(v)), "% !& %", 0.5, BOOLEAN, BOOLEAN, BOOLEAN),
         // Number operators
-        ADD((v) -> new EvalVar.Num(v[0].d() + v[1].d()), "% + %", 128, NUMBER, NUMBER, NUMBER),
-        SUB((v) -> new EvalVar.Num(v[0].d() - v[1].d()), "% - %", 128, NUMBER, NUMBER, NUMBER),
-        MULT((v) -> new EvalVar.Num(v[0].d() * v[1].d()), "% * %", 64, NUMBER, NUMBER, NUMBER),
-        DIV((v) -> new EvalVar.Num(v[0].d() / v[1].d()), "% / %", 64, NUMBER, NUMBER, NUMBER),
-        POW((v) -> new EvalVar.Num(Math.pow(v[0].d(), v[1].d())), "% ^ %", 16, NUMBER, NUMBER, NUMBER),
+        ADD((v) -> new EvalVar.Num(v[0].d() + v[1].d()), "% + %", 0.1, NUMBER, NUMBER, NUMBER),
+        SUB((v) -> new EvalVar.Num(v[0].d() - v[1].d()), "% - %", 0.1, NUMBER, NUMBER, NUMBER),
+        MULT((v) -> new EvalVar.Num(v[0].d() * v[1].d()), "% * %", 0.2, NUMBER, NUMBER, NUMBER),
+        DIV((v) -> new EvalVar.Num(v[0].d() / v[1].d()), "% / %", 0.2, NUMBER, NUMBER, NUMBER),
+        POW((v) -> new EvalVar.Num(Math.pow(v[0].d(), v[1].d())), "% ^ %", 0.3, NUMBER, NUMBER, NUMBER),
         SQRT((v) -> new EvalVar.Num(Math.sqrt(v[0].d())), "sqrt %", NUMBER, NUMBER),
         ROOT((v) -> new EvalVar.Num(Math.pow(v[0].d(), 1 / v[1].d())), "root % %", NUMBER, NUMBER, NUMBER),
         MAX((v) -> new EvalVar.Num(Math.max(v[0].d(), v[1].d())), "max % %", NUMBER, NUMBER, NUMBER),
@@ -65,7 +60,7 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
         FLOOR((v) -> new EvalVar.Num(Math.floor(v[0].d())), "floor %", NUMBER, NUMBER),
         CEIL((v) -> new EvalVar.Num(Math.ceil(v[0].d())), "ceil %", NUMBER, NUMBER),
         ROUND((v) -> new EvalVar.Num(Math.round(v[0].d())), "round %", NUMBER, NUMBER),
-        RANDOM((v) -> new EvalVar.Num(Math.random()), "random", 0, NUMBER),
+        RANDOM((v) -> new EvalVar.Num(Math.random()), "random", NUMBER),
         GREATER((v) -> new EvalVar.Bool(v[0].d() > v[1].d()), "% > %", NUMBER, NUMBER, BOOLEAN),
         GREATER_E((v) -> new EvalVar.Bool(v[0].d() >= v[1].d()), "% >= %", NUMBER, NUMBER, BOOLEAN),
         LESSER((v) -> new EvalVar.Bool(v[0].d() < v[1].d()), "% < %", NUMBER, NUMBER, BOOLEAN),
@@ -96,7 +91,7 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
         public final int argsBefore;
         public final int argsAfter;
         public final EvalOperatorToken[] tokens;
-        public final int priority;
+        public final float priority;
         public final VarType returnType;
         public final VarType[] inputTypes;
 
@@ -115,13 +110,13 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
                 this.argsBefore = (int) split[0].chars().filter(c -> c == '%').count();
                 this.argsAfter = (int) split[1].chars().filter(c -> c == '%').count();
             }
-            this.priority = Integer.MAX_VALUE;
+            this.priority = 0;
             this.returnType = returnType;
             this.inputTypes = inputTypes;
             this.tokens = EvalOperatorToken.getTokensForOperator(format);
         }
 
-        FunType(Fun fun, String format, int priority, VarType returnType, VarType... inputTypes) {
+        FunType(Fun fun, String format, double priority, VarType returnType, VarType... inputTypes) {
             this.fun = fun;
             this.format = format;
             this.keyword = format.replace(" ", "").replace("%", "");
@@ -136,7 +131,7 @@ public class EvalOperator extends EvalToken implements Comparable<EvalOperator> 
                 this.argsBefore = (int) split[0].chars().filter(c -> c == '%').count();
                 this.argsAfter = (int) split[1].chars().filter(c -> c == '%').count();
             }
-            this.priority = priority;
+            this.priority = (float) priority;
             this.returnType = returnType;
             this.inputTypes = inputTypes;
             this.tokens = EvalOperatorToken.getTokensForOperator(format);
