@@ -21,7 +21,8 @@ public class Evaluator {
     }
 
     public static void main(String[] args) {
-        Evaluator evaluator = new Evaluator(new EvalVar.Num("x", 4));
-        System.out.println(evaluator.eval("0 == x % 2").value);
+        Evaluator evaluator = new Evaluator(new EvalVar.Str("msg", "HAWK: Your_Mom flagged OwO VL: 7"),
+          new EvalVar.Str("user", "Your_Mom"));
+        System.out.println(evaluator.eval("!(msg contains user)").value);
     }
 }

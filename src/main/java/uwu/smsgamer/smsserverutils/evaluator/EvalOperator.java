@@ -73,6 +73,8 @@ public class EvalOperator extends EvalToken {
         REPLACE((v) -> new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replace $ $ ", STRING, STRING, STRING, BOOLEAN),
         REPLACE_FIRST((v) -> new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replaceFirst $ $ ", STRING, STRING, STRING, BOOLEAN),
         REPLACE_REG((v) -> new EvalVar.Str(v[0].s().replaceAll(v[1].s(), v[2].s())), "$ replaceReg $ $ ", STRING, STRING, STRING, BOOLEAN),
+        STARTS_WITH((v) -> new EvalVar.Bool(v[0].s().startsWith(v[1].s())), "$ startsWith $ ", STRING, STRING, BOOLEAN),
+        ENDS_WITH((v) -> new EvalVar.Bool(v[0].s().endsWith(v[1].s())), "$ endsWith $ ", STRING, STRING, BOOLEAN),
         CONTAINS((v) -> new EvalVar.Bool(v[0].s().contains(v[1].s())), "$ contains $ ", STRING, STRING, BOOLEAN),
         CONTAINS_IC((v) -> new EvalVar.Bool(v[0].s().toLowerCase().contains(v[1].s().toLowerCase())), "$ containsIc $ ", STRING, STRING, BOOLEAN),
         MATCHES((v) -> new EvalVar.Bool(v[0].s().matches(v[1].s())), "$ matches $ ", STRING, STRING, BOOLEAN),
