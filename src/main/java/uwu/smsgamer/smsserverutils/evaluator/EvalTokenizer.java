@@ -49,7 +49,7 @@ public class EvalTokenizer {
                     } else if (opToken.name.startsWith("0b")) {
                         tokens.set(i, new EvalVar.Num(Integer.parseInt(opToken.name.substring(2), 2), token.nestingLevel));
                     } else {
-                        tokens.set(i, new EvalVar.Num(Integer.parseInt(opToken.name), token.nestingLevel));
+                        tokens.set(i, new EvalVar.Num(Double.parseDouble(opToken.name), token.nestingLevel));
                     }
                 } else {
                     if (opToken.name.equals("true")) tokens.set(i, new EvalVar.Bool(true, token.nestingLevel));
@@ -74,7 +74,12 @@ public class EvalTokenizer {
     }
 
     public void sortFuns() {
-        while (tokens.size() > 1) toFunsRound();
+        float lastSize = tokens.size() + 1;
+        while (tokens.size() > 1) {
+            toFunsRound();
+            if (lastSize == tokens.size()) throw new RuntimeException("Loop or invalid tokens.");
+            lastSize = tokens.size();
+        }
     }
 
     private float getHighestNestingLevel() {
@@ -111,6 +116,7 @@ public class EvalTokenizer {
 
     private void getNextToken(char current) {
         StringBuilder buf = new StringBuilder(String.valueOf(current));
+        char p = current;
         W:
         while (shouldContinue()) {
             char c = next();
@@ -120,10 +126,12 @@ public class EvalTokenizer {
                 case '(':
                 case ')':
                     at--;
-                case '.':
                     break W;
+                case '.':
+                    if (!Character.isDigit(p)) break W;
             }
             buf.append(c);
+            p = c;
         }
         tokens.add(new EvalVar.Unknown(buf.toString(), nest));
     }
@@ -170,7 +178,7 @@ public class EvalTokenizer {
     }
 
     public static void main(String[] args) {
-        EvalTokenizer tokenizer = new EvalTokenizer("(1 + 2 * 3) - ((1 + 2) * 3) s+ ((1 + 2) * 3) - (1 + 2 * 3)"); // fixme
+        EvalTokenizer tokenizer = new EvalTokenizer("x == 3"); // fixme
         tokenizer.tokenize();
         System.out.println(tokenizer.tokens);
         tokenizer.parseToVars();

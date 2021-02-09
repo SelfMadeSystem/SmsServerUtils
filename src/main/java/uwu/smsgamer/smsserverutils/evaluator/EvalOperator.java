@@ -65,6 +65,10 @@ public class EvalOperator extends EvalToken {
         GREATER_E((v) -> new EvalVar.Bool(v[0].d() >= v[1].d()), "% >= %", NUMBER, NUMBER, BOOLEAN),
         LESSER((v) -> new EvalVar.Bool(v[0].d() < v[1].d()), "% < %", NUMBER, NUMBER, BOOLEAN),
         LESSER_E((v) -> new EvalVar.Bool(v[0].d() <= v[1].d()), "% <= %", NUMBER, NUMBER, BOOLEAN),
+        STRIP_ZERO((v) -> {
+            if (v[0].i() == v[0].d()) return new EvalVar.Str(Integer.toString(v[0].i()));
+            else return new EvalVar.Str(Double.toString(v[0].d()));
+        }, "stp-0 %", 0.05, NUMBER, STRING),
         // String operators
         CONCAT((v) -> new EvalVar.Str(v[0].s().concat(v[1].s())), "% s+ %", STRING, STRING, STRING),
         SUB_STR((v) -> new EvalVar.Str(v[0].s().substring(v[1].i(), v[2].i())), "% substr % % ", STRING, NUMBER, NUMBER, BOOLEAN),
