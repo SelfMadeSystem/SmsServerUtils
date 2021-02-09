@@ -15,25 +15,24 @@ public class EvalTokenizer {
     }
 
     public EvalTokenizer tokenize() {
-        W:
         while (shouldContinue()) {
             char c = next();
             if (Character.isWhitespace(c)) continue;
             switch (c) {
                 case '"':
                     getStringToken();
-                    continue W;
+                    continue;
                 case '#':
                     skipComment();
-                    continue W;
+                    continue;
                 case '(':
                     nest++;
-                    continue W;
+                    continue;
                 case ')':
                     nest--;
-                    continue W;
+                    continue;
                 case '.':
-                    continue W;
+                    continue;
             }
             getNextToken(c);
         }
