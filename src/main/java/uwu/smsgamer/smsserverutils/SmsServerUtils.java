@@ -25,21 +25,6 @@ public final class SmsServerUtils {
     }
 
     public void onLoad() {
-
-        try {
-            Class.forName("io.github.retrooper.packetevents.PacketEvents", true, this.getClass().getClassLoader());
-            System.out.println("==================Found PacketEvents==================");
-        } catch (ClassNotFoundException e) {
-            System.out.println("==================Did not find PacketEvents==================");
-        }
-
-        try {
-            Class.forName("org.python.Version", true, this.getClass().getClassLoader());
-            System.out.println("==================Found Jython==================");
-        } catch (ClassNotFoundException e) {
-            System.out.println("==================Did not find Jython==================");
-        }
-
         /*
          * PacketEvents likes to maintain compatibility with other plugins shading the same API.
          * If some other API loaded before you, the create method will return it's PacketEvents instance
@@ -68,9 +53,7 @@ public final class SmsServerUtils {
     }
 
     public void onEnable() {
-        ConfigManager.setup("messages", "py-config");
-
-//        uwu.smsgamer.senapi.ConsolePlayer.getInstance();
+        ConfigManager.setup("messages");
 
         //Initiate PacketEvents
         PacketEvents.get().init(plugin);

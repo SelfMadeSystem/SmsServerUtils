@@ -22,6 +22,9 @@ public class EvalTokenizer {
                 case '"':
                     getStringToken();
                     continue;
+                case '%':
+                    getPapiToken();
+                    continue;
                 case '#':
                     skipComment();
                     continue;
@@ -179,6 +182,42 @@ public class EvalTokenizer {
             buf.append(c);
         }
         tokens.add(new EvalVar.Str(buf.toString(), nest));
+    }
+
+    private void getPapiToken() {
+        StringBuilder buf = new StringBuilder();
+        while (shouldContinue()) {
+            char c = next();
+            if (c == '%') break;
+            if (c == '\\') {
+                char n = next();
+                switch (n) {
+                    case '"':
+                        c = '"';
+                        break;
+                    case '%':
+                        c = '%';
+                        break;
+                    case 'b':
+                        c = '\b';
+                        break;
+                    case 'f':
+                        c = '\f';
+                        break;
+                    case 'n':
+                        c = '\n';
+                        break;
+                    case 'r':
+                        c = '\r';
+                        break;
+                    case 't':
+                        c = '\t';
+                        break; // TODO:  case 'u':
+                }
+            }
+            buf.append(c);
+        }
+        tokens.add(new EvalVar.PAPI(buf.toString(), nest));
     }
 
     private char next() {

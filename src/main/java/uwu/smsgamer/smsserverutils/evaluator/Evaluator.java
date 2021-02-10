@@ -1,5 +1,7 @@
 package uwu.smsgamer.smsserverutils.evaluator;
 
+import org.bukkit.OfflinePlayer;
+
 import java.util.HashMap;
 
 /**
@@ -7,8 +9,10 @@ import java.util.HashMap;
  */
 public class Evaluator {
     public HashMap<String, EvalVar<?>> varMap = new HashMap<>();
+    public OfflinePlayer player;
 
-    public Evaluator(EvalVar<?>... defVars) {
+    public Evaluator(OfflinePlayer player, EvalVar<?>... defVars) {
+        this.player = player;
         for (EvalVar<?> defVar : defVars) addVar(defVar);
     }
 
@@ -18,11 +22,5 @@ public class Evaluator {
 
     public EvalVar<?> eval(String str) {
         return new EvalTokenizer(str).tokenize().parseToVars().parseToFuns().sortFuns().tokens.get(0).toVar(this);
-    }
-
-    public static void main(String[] args) {
-        Evaluator evaluator = new Evaluator(new EvalVar.Str("msg", "HAWK: Your_Mom flagged OwO VL: 7"),
-          new EvalVar.Str("user", "Your_Mom"));
-        System.out.println(evaluator.eval("!(msg contains user)").value);
     }
 }

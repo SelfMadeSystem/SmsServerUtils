@@ -1,7 +1,8 @@
 package uwu.smsgamer.smsserverutils.evaluator;
 
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
+import uwu.smsgamer.senapi.utils.StringUtils;
 
 import java.util.*;
 
@@ -194,6 +195,33 @@ public abstract class EvalVar<T> extends EvalToken {
         @Override
         public EvalVar<?> toVar(Evaluator ev) {
             return ev == null ? null : ev.varMap.get(name);
+        }
+    }
+
+    public static class PAPI extends EvalToken {
+        private final String value;
+
+        public PAPI(@NotNull String value, int nest) {
+            super(nest);
+            this.value = value;
+        }
+
+        public PAPI(@Nullable String value) {
+            super(0);
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "PAPI{" +
+              ", value=" + value +
+              ", nestingLevel=" + nestingLevel +
+              "}\n";
+        }
+
+        @Override
+        public EvalVar<?> toVar(Evaluator ev) {
+            return new Str(StringUtils.replacePlaceholders(ev.player, "%" + value + "%"));
         }
     }
 }

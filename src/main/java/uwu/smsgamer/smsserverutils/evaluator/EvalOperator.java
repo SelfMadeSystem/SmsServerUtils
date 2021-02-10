@@ -1,5 +1,6 @@
 package uwu.smsgamer.smsserverutils.evaluator;
 
+import uwu.smsgamer.senapi.utils.StringUtils;
 import uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType;
 
 import java.util.regex.Pattern;
@@ -27,7 +28,7 @@ public class EvalOperator extends EvalToken {
     public EvalVar<?> toVar(Evaluator ev) {
         EvalVar<?>[] vars = new EvalVar[args.length];
         for (int i = 0; i < args.length; i++) vars[i] = args[i].toVar(ev);
-        return type.fun.run(vars);
+        return type.fun.run(ev, vars);
     }
 
     public float priority() {
@@ -36,57 +37,58 @@ public class EvalOperator extends EvalToken {
 
     public enum FunType {
         // Boolean operators
-        NOT((v) -> new EvalVar.Bool(!v[0].bool()), "! $", 0.9, BOOLEAN, BOOLEAN),
-        AND((v) -> new EvalVar.Bool(v[0].bool() && v[1].bool()), "$ && $", 0.5, BOOLEAN, BOOLEAN, BOOLEAN),
-        OR((v) -> new EvalVar.Bool(v[0].bool() || v[1].bool()), "$ || $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
-        XOR((v) -> new EvalVar.Bool(v[0].bool() == v[1].bool()), "$ ^^ $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
-        NOR((v) -> NOT.run(OR.run(v)), "$ !| $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
-        XNOR((v) -> NOT.run(XOR.run(v)), "$ !^ $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
-        NAND((v) -> NOT.run(AND.run(v)), "$ !& $", 0.5, BOOLEAN, BOOLEAN, BOOLEAN),
+        NOT((e, v) -> new EvalVar.Bool(!v[0].bool()), "! $", 0.9, BOOLEAN, BOOLEAN),
+        AND((e, v) -> new EvalVar.Bool(v[0].bool() && v[1].bool()), "$ && $", 0.5, BOOLEAN, BOOLEAN, BOOLEAN),
+        OR((e, v) -> new EvalVar.Bool(v[0].bool() || v[1].bool()), "$ || $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        XOR((e, v) -> new EvalVar.Bool(v[0].bool() == v[1].bool()), "$ ^^ $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        NOR((e, v) ->NOT.run(e, OR.run(e, v)), "$ !| $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        XNOR((e, v) ->NOT.run(e, XOR.run(e, v)), "$ !^ $", 0.7, BOOLEAN, BOOLEAN, BOOLEAN),
+        NAND((e, v) ->NOT.run(e, AND.run(e, v)), "$ !& $", 0.5, BOOLEAN, BOOLEAN, BOOLEAN),
         // Number operators
-        ADD((v) -> new EvalVar.Num(v[0].d() + v[1].d()), "$ + $", 0.1, NUMBER, NUMBER, NUMBER),
-        SUB((v) -> new EvalVar.Num(v[0].d() - v[1].d()), "$ - $", 0.1, NUMBER, NUMBER, NUMBER),
-        MULT((v) -> new EvalVar.Num(v[0].d() * v[1].d()), "$ * $", 0.2, NUMBER, NUMBER, NUMBER),
-        DIV((v) -> new EvalVar.Num(v[0].d() / v[1].d()), "$ / $", 0.2, NUMBER, NUMBER, NUMBER),
-        MOD((v) -> new EvalVar.Num(v[0].d() % v[1].d()), "$ % $", 0.2, NUMBER, NUMBER, NUMBER),
-        POW((v) -> new EvalVar.Num(Math.pow(v[0].d(), v[1].d())), "$ ^ $", 0.3, NUMBER, NUMBER, NUMBER),
-        SQRT((v) -> new EvalVar.Num(Math.sqrt(v[0].d())), "sqrt $", NUMBER, NUMBER),
-        ISQRT((v) -> new EvalVar.Num(1 / Math.sqrt(v[0].d())), "isqrt $", NUMBER, NUMBER),
-        ROOT((v) -> new EvalVar.Num(Math.pow(v[0].d(), 1 / v[1].d())), "root $ $", NUMBER, NUMBER, NUMBER),
-        MAX((v) -> new EvalVar.Num(Math.max(v[0].d(), v[1].d())), "max $ $", NUMBER, NUMBER, NUMBER),
-        MIN((v) -> new EvalVar.Num(Math.min(v[0].d(), v[1].d())), "min $ $", NUMBER, NUMBER, NUMBER),
-        FLOOR((v) -> new EvalVar.Num(Math.floor(v[0].d())), "floor $", NUMBER, NUMBER),
-        CEIL((v) -> new EvalVar.Num(Math.ceil(v[0].d())), "ceil $", NUMBER, NUMBER),
-        ROUND((v) -> new EvalVar.Num(Math.round(v[0].d())), "round $", NUMBER, NUMBER),
-        RANDOM((v) -> new EvalVar.Num(Math.random()), "random", NUMBER),
-        GREATER((v) -> new EvalVar.Bool(v[0].d() > v[1].d()), "$ > $", NUMBER, NUMBER, BOOLEAN),
-        GREATER_E((v) -> new EvalVar.Bool(v[0].d() >= v[1].d()), "$ >= $", NUMBER, NUMBER, BOOLEAN),
-        LESSER((v) -> new EvalVar.Bool(v[0].d() < v[1].d()), "$ < $", NUMBER, NUMBER, BOOLEAN),
-        LESSER_E((v) -> new EvalVar.Bool(v[0].d() <= v[1].d()), "$ <= $", NUMBER, NUMBER, BOOLEAN),
-        STRIP_ZERO((v) -> {
+        ADD((e, v) ->new EvalVar.Num(v[0].d() + v[1].d()), "$ + $", 0.1, NUMBER, NUMBER, NUMBER),
+        SUB((e, v) ->new EvalVar.Num(v[0].d() - v[1].d()), "$ - $", 0.1, NUMBER, NUMBER, NUMBER),
+        MULT((e, v) ->new EvalVar.Num(v[0].d() * v[1].d()), "$ * $", 0.2, NUMBER, NUMBER, NUMBER),
+        DIV((e, v) ->new EvalVar.Num(v[0].d() / v[1].d()), "$ / $", 0.2, NUMBER, NUMBER, NUMBER),
+        MOD((e, v) ->new EvalVar.Num(v[0].d() % v[1].d()), "$ % $", 0.2, NUMBER, NUMBER, NUMBER),
+        POW((e, v) ->new EvalVar.Num(Math.pow(v[0].d(), v[1].d())), "$ ^ $", 0.3, NUMBER, NUMBER, NUMBER),
+        SQRT((e, v) ->new EvalVar.Num(Math.sqrt(v[0].d())), "sqrt $", NUMBER, NUMBER),
+        ISQRT((e, v) ->new EvalVar.Num(1 / Math.sqrt(v[0].d())), "isqrt $", NUMBER, NUMBER),
+        ROOT((e, v) ->new EvalVar.Num(Math.pow(v[0].d(), 1 / v[1].d())), "root $ $", NUMBER, NUMBER, NUMBER),
+        MAX((e, v) ->new EvalVar.Num(Math.max(v[0].d(), v[1].d())), "max $ $", NUMBER, NUMBER, NUMBER),
+        MIN((e, v) ->new EvalVar.Num(Math.min(v[0].d(), v[1].d())), "min $ $", NUMBER, NUMBER, NUMBER),
+        FLOOR((e, v) ->new EvalVar.Num(Math.floor(v[0].d())), "floor $", NUMBER, NUMBER),
+        CEIL((e, v) ->new EvalVar.Num(Math.ceil(v[0].d())), "ceil $", NUMBER, NUMBER),
+        ROUND((e, v) ->new EvalVar.Num(Math.round(v[0].d())), "round $", NUMBER, NUMBER),
+        RANDOM((e, v) ->new EvalVar.Num(Math.random()), "random", NUMBER),
+        GREATER((e, v) ->new EvalVar.Bool(v[0].d() > v[1].d()), "$ > $", NUMBER, NUMBER, BOOLEAN),
+        GREATER_E((e, v) ->new EvalVar.Bool(v[0].d() >= v[1].d()), "$ >= $", NUMBER, NUMBER, BOOLEAN),
+        LESSER((e, v) ->new EvalVar.Bool(v[0].d() < v[1].d()), "$ < $", NUMBER, NUMBER, BOOLEAN),
+        LESSER_E((e, v) ->new EvalVar.Bool(v[0].d() <= v[1].d()), "$ <= $", NUMBER, NUMBER, BOOLEAN),
+        STRIP_ZERO((e, v) ->{
             if (v[0].i() == v[0].d()) return new EvalVar.Str(Integer.toString(v[0].i()));
             else return new EvalVar.Str(Double.toString(v[0].d()));
         }, "stp-0 $", 0.05, NUMBER, STRING),
         // String operators
-        CONCAT((v) -> new EvalVar.Str(v[0].s().concat(v[1].s())), "$ s+ $", STRING, STRING, STRING),
-        SUB_STR((v) -> new EvalVar.Str(v[0].s().substring(v[1].i(), v[2].i())), "$ substr $ $ ", STRING, NUMBER, NUMBER, BOOLEAN),
-        REPLACE((v) -> new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replace $ $ ", STRING, STRING, STRING, BOOLEAN),
-        REPLACE_FIRST((v) -> new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replaceFirst $ $ ", STRING, STRING, STRING, BOOLEAN),
-        REPLACE_REG((v) -> new EvalVar.Str(v[0].s().replaceAll(v[1].s(), v[2].s())), "$ replaceReg $ $ ", STRING, STRING, STRING, BOOLEAN),
-        STARTS_WITH((v) -> new EvalVar.Bool(v[0].s().startsWith(v[1].s())), "$ startsWith $ ", STRING, STRING, BOOLEAN),
-        ENDS_WITH((v) -> new EvalVar.Bool(v[0].s().endsWith(v[1].s())), "$ endsWith $ ", STRING, STRING, BOOLEAN),
-        CONTAINS((v) -> new EvalVar.Bool(v[0].s().contains(v[1].s())), "$ contains $ ", STRING, STRING, BOOLEAN),
-        CONTAINS_IC((v) -> new EvalVar.Bool(v[0].s().toLowerCase().contains(v[1].s().toLowerCase())), "$ containsIc $ ", STRING, STRING, BOOLEAN),
-        MATCHES((v) -> new EvalVar.Bool(v[0].s().matches(v[1].s())), "$ matches $ ", STRING, STRING, BOOLEAN),
-        INDEX_OF((v) -> new EvalVar.Num(v[0].s().indexOf(v[1].s())), "$ indexOf $ $ ", STRING, STRING, NUMBER),
-        LENGTH((v) -> new EvalVar.Num(v[0].s().length()), "$ length", STRING, NUMBER),
-        EQUALS_IC((v) -> new EvalVar.Bool(v[0].s().equalsIgnoreCase(v[1].s())), "$ equalsIc $ ", STRING, STRING, NUMBER),
+        CONCAT((e, v) ->new EvalVar.Str(v[0].s().concat(v[1].s())), "$ s+ $", STRING, STRING, STRING),
+        SUB_STR((e, v) ->new EvalVar.Str(v[0].s().substring(v[1].i(), v[2].i())), "$ substr $ $ ", STRING, NUMBER, NUMBER, BOOLEAN),
+        REPLACE((e, v) ->new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replace $ $ ", STRING, STRING, STRING, BOOLEAN),
+        REPLACE_FIRST((e, v) ->new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replaceFirst $ $ ", STRING, STRING, STRING, BOOLEAN),
+        REPLACE_REG((e, v) ->new EvalVar.Str(v[0].s().replaceAll(v[1].s(), v[2].s())), "$ replaceReg $ $ ", STRING, STRING, STRING, BOOLEAN),
+        STARTS_WITH((e, v) ->new EvalVar.Bool(v[0].s().startsWith(v[1].s())), "$ startsWith $ ", STRING, STRING, BOOLEAN),
+        ENDS_WITH((e, v) ->new EvalVar.Bool(v[0].s().endsWith(v[1].s())), "$ endsWith $ ", STRING, STRING, BOOLEAN),
+        CONTAINS((e, v) ->new EvalVar.Bool(v[0].s().contains(v[1].s())), "$ contains $ ", STRING, STRING, BOOLEAN),
+        CONTAINS_IC((e, v) ->new EvalVar.Bool(v[0].s().toLowerCase().contains(v[1].s().toLowerCase())), "$ containsIc $ ", STRING, STRING, BOOLEAN),
+        MATCHES((e, v) ->new EvalVar.Bool(v[0].s().matches(v[1].s())), "$ matches $ ", STRING, STRING, BOOLEAN),
+        INDEX_OF((e, v) ->new EvalVar.Num(v[0].s().indexOf(v[1].s())), "$ indexOf $ $ ", STRING, STRING, NUMBER),
+        LENGTH((e, v) ->new EvalVar.Num(v[0].s().length()), "$ length", STRING, NUMBER),
+        EQUALS_IC((e, v) ->new EvalVar.Bool(v[0].s().equalsIgnoreCase(v[1].s())), "$ equalsIc $ ", STRING, STRING, NUMBER),
+        PAPI((e, v) ->new EvalVar.Str(StringUtils.replacePlaceholders(e.player, v[0].s())), "papi $ ", STRING, STRING, NUMBER),
         // Any operators
-        EQUALS((v) -> new EvalVar.Bool(v[0].s().equals(v[1].s())), "$ == $", ANY, ANY, NUMBER),
+        EQUALS((e, v) ->new EvalVar.Bool(v[0].s().equals(v[1].s())), "$ == $", ANY, ANY, NUMBER),
         ;
 
-        public EvalVar<?> run(EvalVar<?>... vars) {
-            return fun.run(vars);
+        public EvalVar<?> run(Evaluator ev, EvalVar<?>... vars) {
+            return fun.run(ev, vars);
         }
 
         public final Fun fun;
@@ -150,6 +152,6 @@ public class EvalOperator extends EvalToken {
     }
 
     public interface Fun {
-        EvalVar<?> run(EvalVar<?>... args);
+        EvalVar<?> run(Evaluator evaluator, EvalVar<?>... args);
     }
 }
