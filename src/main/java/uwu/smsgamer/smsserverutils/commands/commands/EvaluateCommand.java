@@ -21,9 +21,9 @@ public class EvaluateCommand extends SmsCommand {
         if (testPermission(sender)) {
             try {
                 Evaluator evaluator = EvalUtils.newEvaluator(sender);
-                ChatUtils.sendMessage(success.getValue().replace("%result%", evaluator.eval(String.join(" ", args)).value.toString()), sender);
+                sender.sendMessage(ChatUtils.toChatString(success.getValue(), sender).replace("%result%", evaluator.eval(String.join(" ", args)).value.toString()));
             } catch (Exception e) {
-                ChatUtils.sendMessage(error.getValue().replace("%msg%", Objects.toString(e.getMessage())), sender);
+                sender.sendMessage(ChatUtils.toChatString(error.getValue(), sender).replace("%msg%", Objects.toString(e.getMessage())));
             }
         }
         return true;
