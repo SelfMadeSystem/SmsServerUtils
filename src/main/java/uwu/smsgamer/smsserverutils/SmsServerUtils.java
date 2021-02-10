@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import uwu.smsgamer.smsserverutils.commands.CommandManager;
 import uwu.smsgamer.smsserverutils.config.ConfigManager;
-import uwu.smsgamer.smsserverutils.listener.PacketProcessor;
+import uwu.smsgamer.smsserverutils.listener.*;
 import uwu.smsgamer.smsserverutils.managers.ChatFilterManager;
 import uwu.smsgamer.smsserverutils.utils.ChatUtils;
 
@@ -75,6 +75,8 @@ public final class SmsServerUtils {
         ChatUtils.init();
 
         CommandManager.setupCommands();
+
+        Bukkit.getPluginManager().registerEvents(BukkitListener.getInstance(), plugin);
 
         ConfigManager.saveConfig("messages");
     }
