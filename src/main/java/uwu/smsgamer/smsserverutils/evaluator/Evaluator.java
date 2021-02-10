@@ -16,7 +16,7 @@ public class Evaluator {
         for (EvalVar<?> defVar : defVars) addVar(defVar);
     }
 
-    private <T> void addVar(EvalVar<T> evalVar) {
+    public <T> void addVar(EvalVar<T> evalVar) {
         varMap.put(evalVar.getName(), evalVar);
     }
 

@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import uwu.smsgamer.smsserverutils.commands.CommandManager;
 import uwu.smsgamer.smsserverutils.config.ConfigManager;
 import uwu.smsgamer.smsserverutils.listener.PacketProcessor;
+import uwu.smsgamer.smsserverutils.managers.ChatFilterManager;
 import uwu.smsgamer.smsserverutils.utils.ChatUtils;
 
 public final class SmsServerUtils {
@@ -53,7 +54,7 @@ public final class SmsServerUtils {
     }
 
     public void onEnable() {
-        ConfigManager.setup("messages");
+        ConfigManager.setup("messages", "chat-filter");
 
         //Initiate PacketEvents
         PacketEvents.get().init(plugin);
@@ -70,10 +71,12 @@ public final class SmsServerUtils {
 
         PacketEvents.get().registerListener(packetProcessor);
 
+        ChatFilterManager.getInstance();
         ChatUtils.init();
+
         CommandManager.setupCommands();
 
-        for (String s : ConfigManager.configs.keySet()) ConfigManager.saveConfig(s);
+        ConfigManager.saveConfig("messages");
     }
 
     public void onDisable() {

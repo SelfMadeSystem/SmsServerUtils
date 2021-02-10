@@ -1,0 +1,27 @@
+# Built in variables:
+# msg - The message being sent to or received from the player
+# no-color-msg - Same as msg but with text modifiers stripped.
+# name - The player's name.
+#
+# Additionally, you can use %papi-placeholders% for PlaceholderAPI
+# placeholders, obviously replacing the `papi-placeholders` part with
+# the actual placeholder. For example: %player-name%
+#
+# For full use on the evaluator system, please check the docs at:
+# <link here>
+
+example: # Average Hawk flag message is:   HAWK: Username failed check. VL: 0
+  check: '(no-color-msg startsWith "HAWK:") #use no-color-msg because msg would start with  §cHAWK:# &&
+  (msg contains "VL:") && !(msg contains name)
+  #We want that ! to invert it because we want to cancel it if its not their flag#'
+  cancel: true # Cancel it; not their flag.
+  replacement: ''
+
+example2: # Average Hawk notif message is:   HAWK: Username failed check. VL: 0
+  check: '(no-color-msg startsWith "hawk:") #use no-color-msg because msg would start with  §cHAWK:# &&
+  (msg contains "VL:") && (msg contains name)
+  #We want to replace it this time with something else if it is their flag#'
+  cancel: false # Don't cancel; it is their flag.
+  replacement: 'name s+ " failed: " s+ (no-color-msg substr ((no-color-msg indexOf " failed ") + 8)
+  (no-color-msg indexOf ".")) s+ " with VL: "
+  s+ (no-color-msg substrr ((no-color-msg indexOf "VL:") + 4))'
