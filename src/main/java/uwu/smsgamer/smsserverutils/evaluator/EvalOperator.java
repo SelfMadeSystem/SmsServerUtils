@@ -1,5 +1,6 @@
 package uwu.smsgamer.smsserverutils.evaluator;
 
+import org.bukkit.ChatColor;
 import uwu.smsgamer.senapi.utils.StringUtils;
 import uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType;
 
@@ -84,6 +85,9 @@ public class EvalOperator extends EvalToken {
         LENGTH((e, v) -> new EvalVar.Num(v[0].s().length()), "$ length", STRING, NUMBER),
         EQUALS_IC((e, v) -> new EvalVar.Bool(v[0].s().equalsIgnoreCase(v[1].s())), "$ equalsIc $ ", STRING, STRING, NUMBER),
         PAPI((e, v) -> new EvalVar.Str(StringUtils.replacePlaceholders(e.player, v[0].s())), "papi $ ", 0.99, STRING, STRING, NUMBER),
+        COLOR((e, v) -> new EvalVar.Str(StringUtils.colorize(v[0].s())), "color $ ", 0.99, STRING, STRING, NUMBER),
+        COLOR_LTD((e, v) -> new EvalVar.Str(StringUtils.colorizeLimited(v[0].s(), v[1].s())), "colorLtd $ $ ", 0.99, STRING, STRING, NUMBER),
+        GET_LAST_COLORS((e, v) -> new EvalVar.Str(ChatColor.getLastColors(v[0].s())), "getLastColors $ ", 0.99, STRING, STRING, NUMBER),
         // Any operators
         EQUALS((e, v) -> new EvalVar.Bool(v[0].s().equals(v[1].s())), "$ == $", ANY, ANY, NUMBER),
         ;
