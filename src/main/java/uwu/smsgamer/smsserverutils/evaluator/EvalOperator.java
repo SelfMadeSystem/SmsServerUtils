@@ -70,6 +70,7 @@ public class EvalOperator extends EvalToken {
         }, "stp-0 $", 0.05, NUMBER, STRING),
         // String operators
         CONCAT((e, v) -> new EvalVar.Str(v[0].s().concat(v[1].s())), "$ s+ $", STRING, STRING, STRING),
+        SUB_STRR((e, v) -> new EvalVar.Str(v[0].s().substring(v[1].i())), "$ substrr $ ", STRING, NUMBER, BOOLEAN),
         SUB_STR((e, v) -> new EvalVar.Str(v[0].s().substring(v[1].i(), v[2].i())), "$ substr $ $ ", STRING, NUMBER, NUMBER, BOOLEAN),
         REPLACE((e, v) -> new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replace $ $ ", STRING, STRING, STRING, BOOLEAN),
         REPLACE_FIRST((e, v) -> new EvalVar.Str(v[0].s().replace(v[1].s(), v[2].s())), "$ replaceFirst $ $ ", STRING, STRING, STRING, BOOLEAN),
@@ -79,7 +80,7 @@ public class EvalOperator extends EvalToken {
         CONTAINS((e, v) -> new EvalVar.Bool(v[0].s().contains(v[1].s())), "$ contains $ ", STRING, STRING, BOOLEAN),
         CONTAINS_IC((e, v) -> new EvalVar.Bool(v[0].s().toLowerCase().contains(v[1].s().toLowerCase())), "$ containsIc $ ", STRING, STRING, BOOLEAN),
         MATCHES((e, v) -> new EvalVar.Bool(v[0].s().matches(v[1].s())), "$ matches $ ", STRING, STRING, BOOLEAN),
-        INDEX_OF((e, v) -> new EvalVar.Num(v[0].s().indexOf(v[1].s())), "$ indexOf $ $ ", STRING, STRING, NUMBER),
+        INDEX_OF((e, v) -> new EvalVar.Num(v[0].s().indexOf(v[1].s())), "$ indexOf $ ", STRING, STRING, NUMBER),
         LENGTH((e, v) -> new EvalVar.Num(v[0].s().length()), "$ length", STRING, NUMBER),
         EQUALS_IC((e, v) -> new EvalVar.Bool(v[0].s().equalsIgnoreCase(v[1].s())), "$ equalsIc $ ", STRING, STRING, NUMBER),
         PAPI((e, v) -> new EvalVar.Str(StringUtils.replacePlaceholders(e.player, v[0].s())), "papi $ ", 0.99, STRING, STRING, NUMBER),

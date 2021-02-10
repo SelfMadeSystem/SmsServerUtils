@@ -8,6 +8,7 @@ public class EvalTokenizer {
     public int nest;
     public int at;
     public int stop;
+    public boolean tryAgain;
 
     public EvalTokenizer(String str) {
         this.charArr = str.toCharArray();
@@ -82,11 +83,13 @@ public class EvalTokenizer {
     }
 
     public EvalTokenizer sortFuns() {
+        tryAgain = false;
         float lastSize = tokens.size() + 1;
         while (tokens.size() > 1) {
             toFunsRound();
-            if (lastSize == tokens.size()) throw new RuntimeException("Loop or invalid tokens.");
+            if (lastSize == tokens.size() && !tryAgain) throw new RuntimeException("Loop or invalid tokens.");
             lastSize = tokens.size();
+            tryAgain = false;
         }
         return this;
     }
@@ -103,6 +106,7 @@ public class EvalTokenizer {
 
     private void toFunsRound() {
         float highest = getHighestNestingLevel();
+        boolean finished = false;
         for (int i = 0; i < tokens.size(); i++) {
             EvalToken token = tokens.get(i);
             if (token == null) {
@@ -121,8 +125,22 @@ public class EvalTokenizer {
                     tokens.set(i + j, null);
                     k++;
                 }
+                finished = true;
                 break;
             }
+        }
+        if (!finished) {
+            for (EvalToken token : tokens) {
+                if (token == null) {
+                    continue;
+                }
+                if (token.getClass() == EvalOperator.class) {
+                    EvalOperator op = (EvalOperator) token;
+                    if (op.priority() != highest) continue;
+                    op.nestingLevel--;
+                }
+            }
+            tryAgain = true;
         }
         //noinspection StatementWithEmptyBody
         while (tokens.remove(null));
