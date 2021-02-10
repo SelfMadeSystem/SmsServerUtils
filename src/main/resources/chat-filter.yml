@@ -15,13 +15,13 @@ example: # Average Hawk flag message is:   HAWK: Username failed check. VL: 0
   (msg contains "VL:") && !(msg contains name)
   #We want that ! to invert it because we want to cancel it if its not their flag#'
   cancel: true # Cancel it; not their flag.
-  replacement: ''
 
 example2: # Average Hawk notif message is:   HAWK: Username failed check. VL: 0
-  check: '(no-color-msg startsWith "hawk:") #use no-color-msg because msg would start with  §cHAWK:# &&
+  check: '(no-color-msg startsWith "HAWK:") #use no-color-msg because msg would start with  §cHAWK:# &&
   (msg contains "VL:") && (msg contains name)
   #We want to replace it this time with something else if it is their flag#'
   cancel: false # Don't cancel; it is their flag.
-  replacement: 'name s+ " failed: " s+ (no-color-msg substr ((no-color-msg indexOf " failed ") + 8)
+  replacement: '"&cOwO:&7 " s+ name s+ " failed: " s+ (no-color-msg substr ((no-color-msg indexOf " failed ") + 8)
   (no-color-msg indexOf ".")) s+ " with VL: "
-  s+ (no-color-msg substrr ((no-color-msg indexOf "VL:") + 4))'
+  s+ (no-color-msg substrr ((no-color-msg indexOf "VL:") + 4)) s+ "&a %player_x% %player_y% %player_z%"'
+  is-json: false # Not json.

@@ -1,15 +1,29 @@
 package uwu.smsgamer.smsserverutils.managers;
 
 import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
+import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
+import io.github.retrooper.packetevents.utils.nms.NMSUtils;
+import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import uwu.smsgamer.smsserverutils.config.ConfigManager;
 import uwu.smsgamer.smsserverutils.evaluator.*;
-import uwu.smsgamer.smsserverutils.utils.EvalUtils;
+import uwu.smsgamer.smsserverutils.utils.*;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class ChatFilterManager {
     private static ChatFilterManager instance;
+    private static Class<?> iChatBaseComponentClass;
+
+    static {
+        try {
+            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static ChatFilterManager getInstance() {
         if (instance == null) instance = new ChatFilterManager();
@@ -23,17 +37,60 @@ public class ChatFilterManager {
     public void packetSendEvent(PacketPlaySendEvent e) {
         YamlConfiguration conf = ConfigManager.getConfig("chat-filter");
         WrappedPacketOutChat chat = new WrappedPacketOutChat(e.getNMSPacket());
-        String msg = chat.getMessage();
-        System.out.println("Msg:" + msg); // Doesn't work on java 11 for some reason...???
-//        for (String key : conf.getKeys(false)) {
-//            ConfigurationSection section = conf.getConfigurationSection(key);
-//            try {
-//                Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
-//                evaluator.addVar(new EvalVar.Str("msg", msg));
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
-//        }
+        String msg = getMessage(chat);
+        if (msg == null || msg.isEmpty()) msg = getMessage1(chat);
+
+        for (String key : conf.getKeys(false)) {
+            ConfigurationSection section = conf.getConfigurationSection(key);
+            try {
+                Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
+                evaluator.addVar(new EvalVar.Str("msg", msg));
+                evaluator.addVar(new EvalVar.Str("no-color-msg", msg));
+                evaluator.addVar(new EvalVar.Str("name", e.getPlayer().getName()));
+                EvalVar<?> result = evaluator.eval(section.getString("check"));
+                if (result.value.getClass().equals(Boolean.class)) {
+                    if ((Boolean) result.value) {
+                        if (section.getBoolean("cancel")) e.setCancelled(true);
+                        else {
+                            String s = evaluator.eval(section.getString("replacement")).value.toString();
+                            s = ChatUtils.toChatString(s, e.getPlayer());
+                            WrappedPacketOutChat newChat = new WrappedPacketOutChat(
+                              s, WrappedPacketOutChat.ChatPosition.CHAT,
+                              e.getPlayer().getUniqueId(), false);
+                            e.setNMSPacket(new NMSPacket(newChat.asNMSPacket()));
+                        }
+                    }
+                } else {
+                    System.out.println(key + ":" + result.getClass());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public String getMessage(WrappedPacketOutChat chat) {
+        final Object iChatBaseObj = chat.readObject(0, iChatBaseComponentClass);
+
+        try {
+            Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
+            return contentString.toString();
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getMessage1(WrappedPacketOutChat chat) {
+        final Object iChatBaseObj = chat.readObject(0, iChatBaseComponentClass);
+
+        try {
+            Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 1).invoke(iChatBaseObj);
+            return contentString.toString();
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String[] args) {

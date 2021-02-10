@@ -9,17 +9,17 @@ import java.util.*;
 @Getter
 public abstract class EvalVar<T> extends EvalToken {
     public String name;
-    @Nullable public T value;
+    public T value;
     public final VarType type;
 
-    protected EvalVar(String name, @Nullable T value, VarType type, int nest) {
+    protected EvalVar(String name, T value, VarType type, int nest) {
         super(nest);
         this.name = name;
         this.value = value;
         this.type = type;
     }
 
-    protected EvalVar(@Nullable T value, VarType type, int nest) {
+    protected EvalVar(T value, VarType type, int nest) {
         super(nest);
         this.name = "__unnamed__";
         this.value = value;
