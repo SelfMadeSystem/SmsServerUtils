@@ -8,3 +8,14 @@ Download: (todo)
 [Documentation](https://github.com/True-cc/SmsServerUtils/wiki)
 
 License: [Apache License 2.0](https://github.com/True-cc/SmsServerUtils/blob/master/LICENSE)
+
+Current features:
+- Chat Filter
+  - Chat (both from player to server and vice versa)
+  - Tab
+- Evaluator
+
+Planned features:
+- Make evaluator better
+- Amazing AntiCheat-like command execution similar to my other plugin [UwUPunishments](https://www.spigotmc.org/resources/70021/)
+- Auto Updater
