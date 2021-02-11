@@ -6,5 +6,6 @@ public class CommandManager {
     public static void setupCommands() {
         new EvaluateCommand();
         new SendMsgCommand();
+        new SmsServerUtilsCommand();
     }
 }

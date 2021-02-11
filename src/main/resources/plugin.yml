@@ -5,6 +5,14 @@ softdepend: [ ProtocolLib, PlaceholderAPI ]
 authors: [ Sms_Gamer_3808 ]
 description: A ton of utilities for server operators.
 commands:
+  smsserverutils:
+    description: Main command for SmsServerUtils.
+    usage: /smsserverutils
+    aliases:
+      - smsserver
+      - smsutils
+      - smssu
+      - smsu
   evaluate:
     description: Evaluates a query based off of user input.
     usage: /eval <eval string>

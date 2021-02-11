@@ -60,7 +60,7 @@ public class ConfigManager {
         }
     }
 
-    public static List<ConfVal<?>> vals = new LinkedList<>();
+    public static Set<ConfVal<?>> vals = new HashSet<>();
 
     @SuppressWarnings("unchecked")
     public static <T> void reloadConfVal(ConfVal<T> val) {
