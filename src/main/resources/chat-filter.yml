@@ -41,7 +41,7 @@ outgoing-chat:
 # %2+% is replaced with    How are you?
 #
 # These are replaced both in strings and as variables.
-incoming-chat:
+incoming-command:
   example:
     check: '(label equalsIc "/pl") or (msg startsWith "/ver ") or (msg startsWith "/version ")'
     cancel: true
@@ -49,8 +49,8 @@ incoming-chat:
     send-msg: '%prefix% &cDon''t get our plugins; thx. Command: %msg% Label: %label%'
     # execute-commands: []
 
-# Same rules as incoming-chat apply here.
-incoming-command:
+# Same rules as incoming-command apply here.
+incoming-chat:
   example2:
     check: '!(label startsWith "/")'
     cancel: false
