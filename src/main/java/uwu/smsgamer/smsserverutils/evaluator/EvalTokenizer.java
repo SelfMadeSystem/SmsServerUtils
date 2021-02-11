@@ -85,9 +85,13 @@ public class EvalTokenizer {
     public EvalTokenizer sortFuns() {
         tryAgain = false;
         float lastSize = tokens.size() + 1;
+        int skipCount = 0;
         while (tokens.size() > 1) {
             toFunsRound();
-            if (lastSize == tokens.size() && !tryAgain) throw new RuntimeException("Loop or invalid tokens.");
+            if (lastSize == tokens.size()) {
+                if (tryAgain && skipCount++ < 100) continue;
+                throw new RuntimeException("Loop or invalid tokens.");
+            }
             lastSize = tokens.size();
             tryAgain = false;
         }
@@ -138,6 +142,7 @@ public class EvalTokenizer {
                     EvalOperator op = (EvalOperator) token;
                     if (op.priority() != highest) continue;
                     op.nestingLevel--;
+                    if (op.nestingLevel < -1) throw new IllegalStateException("OP Nesting level is going less than -1! Should never go below 0.");
                 }
             }
             tryAgain = true;

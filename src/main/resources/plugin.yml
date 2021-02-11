@@ -7,6 +7,13 @@ description: A ton of utilities for server operators.
 commands:
   evaluate:
     description: Evaluates a query based off of user input.
-    usage: /eval <python command>
+    usage: /eval <eval string>
     aliases:
       - eval
+  send-message:
+    description: Sends a message to someone
+    usage: /send-message <player name> <message>
+    aliases:
+      - send-msg
+      - sendmessag
+      - sendmsg

@@ -43,11 +43,12 @@ outgoing-chat:
 # These are replaced both in strings and as variables.
 incoming-command:
   example:
-    check: '(label equalsIc "/pl") or (msg startsWith "/ver ") or (msg startsWith "/version ")'
+    check: '(label equalsIc "/pl") || (msg startsWith "/ver ") || (msg startsWith "/version ")'
     cancel: true
     # No evaluator, but still going through PAPI and the preprocessor. (papi first tho)
     send-msg: '%prefix% &cDon''t get our plugins; thx. Command: %msg% Label: %label%'
-    # execute-commands: []
+    execute-commands:
+      - 'sendmsg %player_name% %prefix% &cPlease don''t get our plugins.'
 
 # Same rules as incoming-command apply here.
 incoming-chat:
@@ -61,7 +62,7 @@ incoming-chat:
 # For the arg
 incoming-tab:
   example:
-    checl: '(label equalsIc "/") or (label equalsIc "/ver") or (label equalsIc "/version")'
+    checl: '(label equalsIc "/") || (label equalsIc "/ver") || (label equalsIc "/version")'
     cancel: false
     # List of stuff. PAPI and colored
     replacement:
