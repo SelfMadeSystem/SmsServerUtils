@@ -89,7 +89,10 @@ public class EvalOperator extends EvalToken {
         COLOR_LTD((e, v) -> new EvalVar.Str(StringUtils.colorizeLimited(v[0].s(), v[1].s())), "colorLtd $ $ ", 0.99, STRING, STRING, NUMBER),
         GET_LAST_COLORS((e, v) -> new EvalVar.Str(ChatColor.getLastColors(v[0].s())), "getLastColors $ ", 0.99, STRING, NUMBER),
         // Any operators
-        EQUALS((e, v) -> new EvalVar.Bool(v[0].s().equals(v[1].s())), "$ == $", ANY, ANY, NUMBER),
+        EQUALS((e, v) -> new EvalVar.Bool(v[0].s().equals(v[1].s())), "$ == $", ANY, ANY, BOOLEAN),
+        // Player
+        HAS_PERM((e, v) -> new EvalVar.Bool(e.player.getPlayer().hasPermission(v[0].s())), "hasPerm $", STRING, BOOLEAN),
+        IS_OP((e, v) -> new EvalVar.Bool(e.player.isOp()), "isOp", BOOLEAN),
         ;
 
         public EvalVar<?> run(Evaluator ev, EvalVar<?>... vars) {
