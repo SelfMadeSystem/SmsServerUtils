@@ -3,6 +3,7 @@ package uwu.smsgamer.smsserverutils.listener;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.TabCompleteEvent;
+import uwu.smsgamer.smsserverutils.managers.ChatFilterManager;
 
 public class BukkitListener implements Listener {
     private static BukkitListener instance;
@@ -15,15 +16,18 @@ public class BukkitListener implements Listener {
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
         System.out.println(e.getMessage());
+        ChatFilterManager.getInstance().commandReceiveEvent(e);
     }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
         System.out.println(e.getMessage());
+        ChatFilterManager.getInstance().chatReceiveEvent(e);
     }
 
     @EventHandler
     public void onTab(TabCompleteEvent e) {
         System.out.println(e.getBuffer());
+        ChatFilterManager.getInstance().tabReceiveEvent(e);
     }
 }

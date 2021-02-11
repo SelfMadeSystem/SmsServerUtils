@@ -8,8 +8,7 @@ import uwu.smsgamer.smsserverutils.config.ConfVal;
 import java.util.List;
 
 public class ChatUtils {
-
-    public static final ConfVal<String> prefix = new ConfVal<>("prefix", "messages", "&6[&aServer&6]&r");
+    public static final ConfVal<String> prefix = new ConfVal<>("prefix", "messages", "&8&l[&6SmsUtils&8&l]");
     public static final ConfVal<String> errorNoMessage = new ConfVal<>("messages.error-no-message", "messages",
       "%prefix% &cAn error occurred whilst executing this command.");
     public static final ConfVal<String> errorWithMessage = new ConfVal<>("messages.error-with-message", "messages",
@@ -17,8 +16,12 @@ public class ChatUtils {
 
     public static void init() {}
 
-    public static void execCmd(ConfVal<List<String>> command, CommandSender player) {
-        for (String s : command.getValue()) execCmd(s, player);
+    public static void execCmd(ConfVal<List<String>> commands, CommandSender player) {
+        for (String s : commands.getValue()) execCmd(s, player);
+    }
+
+    public static void execCmd(List<String> commands, CommandSender player) {
+        if (commands != null) for (String s : commands) execCmd(s, player);
     }
 
     public static void execCmd(String command, CommandSender player) {

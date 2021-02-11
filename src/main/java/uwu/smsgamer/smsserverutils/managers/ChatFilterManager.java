@@ -7,15 +7,18 @@ import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacke
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
 import io.github.retrooper.packetevents.utils.reflection.Reflection;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.TabCompleteEvent;
+import uwu.smsgamer.senapi.utils.StringUtils;
 import uwu.smsgamer.smsserverutils.config.ConfigManager;
 import uwu.smsgamer.smsserverutils.evaluator.*;
 import uwu.smsgamer.smsserverutils.utils.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 public class ChatFilterManager {
     private static ChatFilterManager instance;
@@ -48,12 +51,12 @@ public class ChatFilterManager {
         String msg = getMessage(chat);
         if (msg == null || msg.isEmpty()) msg = getMessage1(chat);
 
+        Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
+        evaluator.addVar(new EvalVar.Str("msg", msg));
+        evaluator.addVar(new EvalVar.Str("name", e.getPlayer().getName()));
         for (String key : conf.getConfigurationSection("outgoing-chat").getKeys(false)) {
             ConfigurationSection section = conf.getConfigurationSection("outgoing-chat." + key);
             try {
-                Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
-                evaluator.addVar(new EvalVar.Str("msg", msg));
-                evaluator.addVar(new EvalVar.Str("name", e.getPlayer().getName()));
                 EvalVar<?> result = evaluator.eval(section.getString("check"));
                 if (result.value.getClass().equals(Boolean.class)) {
                     if ((Boolean) result.value) {
@@ -66,6 +69,7 @@ public class ChatFilterManager {
                               e.getPlayer().getUniqueId(), false);
                             e.setNMSPacket(new NMSPacket(newChat.asNMSPacket()));
                         }
+                        ChatUtils.execCmd(section.getStringList("execute-commands"), e.getPlayer());
                     }
                 } else {
                     System.out.println(key + ":" + result.getClass());
@@ -77,13 +81,77 @@ public class ChatFilterManager {
     }
 
     public void commandReceiveEvent(PlayerCommandPreprocessEvent e) {
+        String message = e.getMessage();
+        String[] args = message.substring(message.indexOf(" ") + 1).split(" ");
+        Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
+        evaluator.addVar(new EvalVar.Str("msg", message));
+        int indOf = message.indexOf(" ");
+        evaluator.addVar(new EvalVar.Str("label", message.substring(0, indOf < 0 ? message.length() : indOf)));
+        evaluator.addVar(new EvalVar.Str("name", e.getPlayer().getName()));
+        for (String key : conf.getConfigurationSection("incoming-command").getKeys(false)) {
+            ConfigurationSection section = conf.getConfigurationSection("incoming-command." + key);
+            try {
+                String check = section.getString("check");
+                check = StringUtils.replaceArgsPlaceholders(check, args);
+                EvalVar<?> result = evaluator.eval(check);
+                if (result.value.getClass().equals(Boolean.class)) {
+                    if ((Boolean) result.value) {
+                        if (section.getBoolean("cancel")) e.setCancelled(true);
+                        else {
+                            String s = evaluator.eval(section.getString("replacement")).value.toString();
+                            s = ChatUtils.toChatString(s, e.getPlayer());
+                            e.setMessage(s);
+                        }
+                        execCmd(section.getStringList("execute-commands"), args, e.getPlayer());
+                    }
+                } else {
+                    System.out.println(key + ":" + result.getClass());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     public void chatReceiveEvent(AsyncPlayerChatEvent e) {
+        String message = e.getMessage();
+        String[] args = message.substring(message.indexOf(" ") + 1).split(" ");
+        Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
+        evaluator.addVar(new EvalVar.Str("msg", message));
+        int indOf = message.indexOf(" ");
+        evaluator.addVar(new EvalVar.Str("label", message.substring(0, indOf < 0 ? message.length() : indOf)));
+        evaluator.addVar(new EvalVar.Str("name", e.getPlayer().getName()));
+        for (String key : conf.getConfigurationSection("incoming-chat").getKeys(false)) {
+            ConfigurationSection section = conf.getConfigurationSection("incoming-chat." + key);
+            try {
+                String check = section.getString("check");
+                check = StringUtils.replaceArgsPlaceholders(check, args);
+                EvalVar<?> result = evaluator.eval(check);
+                if (result.value.getClass().equals(Boolean.class)) {
+                    if ((Boolean) result.value) {
+                        if (section.getBoolean("cancel")) e.setCancelled(true);
+                        else {
+                            String s = evaluator.eval(section.getString("replacement")).value.toString();
+                            s = ChatUtils.toChatString(s, e.getPlayer());
+                            e.setMessage(s);
+                        }
+                    }
+                    execCmd(section.getStringList("execute-commands"), args, e.getPlayer());
+                } else {
+                    System.out.println(key + ":" + result.getClass());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     public void tabReceiveEvent(TabCompleteEvent e) {
 
+    }
+
+    public static void execCmd(List<String> commands, String[] args, CommandSender player) {
+        if (commands != null) for (String s : commands) ChatUtils.execCmd(StringUtils.replaceArgsPlaceholders(s, args), player);
     }
 
     public String getMessage(WrappedPacketOutChat chat) {
