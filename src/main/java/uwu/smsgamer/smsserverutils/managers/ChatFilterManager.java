@@ -207,18 +207,4 @@ public class ChatFilterManager {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        String name = "Sms_Gamer_3808";
-        String msg = "&cHAWK: Sms_Gamer_3808 failed flight. VL: 13";
-        String msgNoColor = "HAWK: Sms_Gamer_3808 failed flight. VL: 13";
-        Evaluator evaluator = new Evaluator(null, new EvalVar.Str("msg", msg),
-          new EvalVar.Str("no-color-msg", msgNoColor),
-          new EvalVar.Str("name", name));
-        System.out.println(evaluator.eval("(no-color-msg startsWith \"HAWK:\") && (msg contains \"VL:\") && (msg contains name)"));
-        System.out.println(evaluator.eval("name s+ \" failed: \" s+ (no-color-msg substr ((no-color-msg indexOf \" failed \") + 8) " +
-          "(no-color-msg indexOf \".\"))" +
-          " s+ \" with VL: \"" +
-          " s+ (no-color-msg substrr ((no-color-msg indexOf \"VL:\") + 4))"));
-    }
 }
