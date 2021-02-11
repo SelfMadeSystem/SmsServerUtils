@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import uwu.smsgamer.senapi.utils.StringUtils;
 import uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import static uwu.smsgamer.smsserverutils.evaluator.EvalVar.VarType.*;
@@ -92,7 +93,7 @@ public class EvalOperator extends EvalToken {
         EQUALS((e, v) -> new EvalVar.Bool(v[0].s().equals(v[1].s())), "$ == $", ANY, ANY, BOOLEAN),
         NOT_EQUALS((e, v) -> new EvalVar.Bool(!v[0].s().equals(v[1].s())), "$ != $", ANY, ANY, BOOLEAN),
         // Player
-        HAS_PERM((e, v) -> new EvalVar.Bool(e.player.getPlayer().hasPermission(v[0].s())), "hasPerm $", STRING, BOOLEAN),
+        HAS_PERM((e, v) -> new EvalVar.Bool(e.player.getPlayer().hasPermission(v[0].s())), "hasPerm $", BOOLEAN, STRING),
         IS_OP((e, v) -> new EvalVar.Bool(e.player.isOp()), "isOp", BOOLEAN),
         ;
 
@@ -110,7 +111,7 @@ public class EvalOperator extends EvalToken {
         public final VarType returnType;
         public final VarType[] inputTypes;
 
-        FunType(Fun fun, String format, VarType returnType, VarType... inputTypes) {
+        FunType(Fun fun, String format, VarType... types) {
             this.fun = fun;
             this.format = format;
             this.keyword = format.replace(" ", "").replace("$", "");
@@ -126,8 +127,8 @@ public class EvalOperator extends EvalToken {
                 this.argsAfter = (int) split[1].chars().filter(c -> c == '$').count();
             }
             this.priority = 0;
-            this.returnType = returnType;
-            this.inputTypes = inputTypes;
+            this.returnType = types[types.length - 1];
+            this.inputTypes = Arrays.copyOfRange(types, 1, types.length - 1);
             this.tokens = EvalOperatorToken.getTokensForOperator(format);
         }
 
