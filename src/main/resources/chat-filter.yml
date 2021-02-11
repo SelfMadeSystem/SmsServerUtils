@@ -62,7 +62,7 @@ incoming-chat:
 # For the arg
 incoming-tab:
   example:
-    checl: '(label equalsIc "/") || (label equalsIc "/ver") || (label equalsIc "/version")'
+    check: '(label equalsIc "/") || (label equalsIc "/ver") || (label equalsIc "/version")'
     cancel: false
     # List of stuff. PAPI and colored
     replacement:

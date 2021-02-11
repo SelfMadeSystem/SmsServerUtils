@@ -10,6 +10,7 @@ import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.TabCompleteEvent;
 import uwu.smsgamer.senapi.utils.StringUtils;
@@ -147,7 +148,36 @@ public class ChatFilterManager {
     }
 
     public void tabReceiveEvent(TabCompleteEvent e) {
-
+        Player p = (Player) e.getSender();
+        String message = e.getBuffer();
+        String[] args = message.substring(message.indexOf(" ") + 1).split(" ");
+        Evaluator evaluator = EvalUtils.newEvaluator(p);
+        evaluator.addVar(new EvalVar.Str("msg", message));
+        int indOf = message.indexOf(" ");
+        evaluator.addVar(new EvalVar.Str("label", message.substring(0, indOf < 0 ? message.length() : indOf)));
+        evaluator.addVar(new EvalVar.Str("name", p.getName()));
+        for (String key : conf.getConfigurationSection("incoming-tab").getKeys(false)) {
+            ConfigurationSection section = conf.getConfigurationSection("incoming-tab." + key);
+            try {
+                String check = section.getString("check");
+                check = StringUtils.replaceArgsPlaceholders(check, args);
+                EvalVar<?> result = evaluator.eval(check);
+                if (result.value.getClass().equals(Boolean.class)) {
+                    if ((Boolean) result.value) {
+                        if (section.getBoolean("cancel")) e.setCancelled(true);
+                        else {
+                            if (section.contains("replacement"))
+                            e.setCompletions(section.getStringList("replacement"));
+                        }
+                    }
+                    execCmd(section.getStringList("execute-commands"), args, p);
+                } else {
+                    System.out.println(key + ":" + result.getClass());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     public static void execCmd(List<String> commands, String[] args, CommandSender player) {

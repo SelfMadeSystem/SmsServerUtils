@@ -1,5 +1,6 @@
 package uwu.smsgamer.smsserverutils.listener;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.TabCompleteEvent;
@@ -28,6 +29,6 @@ public class BukkitListener implements Listener {
     @EventHandler
     public void onTab(TabCompleteEvent e) {
         System.out.println(e.getBuffer());
-        ChatFilterManager.getInstance().tabReceiveEvent(e);
+        if (e.getSender() instanceof Player) ChatFilterManager.getInstance().tabReceiveEvent(e);
     }
 }
