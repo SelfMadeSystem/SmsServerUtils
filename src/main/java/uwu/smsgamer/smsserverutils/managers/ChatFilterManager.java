@@ -33,7 +33,7 @@ public class ChatFilterManager {
         }
     }
 
-    private final YamlConfiguration conf;
+    private YamlConfiguration conf;
 
     public static ChatFilterManager getInstance() {
         if (instance == null) instance = new ChatFilterManager();
@@ -42,6 +42,10 @@ public class ChatFilterManager {
 
     public ChatFilterManager() {
         instance = this;
+        conf = ConfigManager.getConfig("chat-filter");
+    }
+
+    public void reload() {
         conf = ConfigManager.getConfig("chat-filter");
     }
 
@@ -82,6 +86,8 @@ public class ChatFilterManager {
     }
 
     public void commandReceiveEvent(PlayerCommandPreprocessEvent e) {
+        if (!conf.contains("incoming-command")) return;
+
         String message = e.getMessage();
         String[] args = message.substring(message.indexOf(" ") + 1).split(" ");
         Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
@@ -115,6 +121,8 @@ public class ChatFilterManager {
     }
 
     public void chatReceiveEvent(AsyncPlayerChatEvent e) {
+        if (!conf.contains("incoming-chat")) return;
+
         String message = e.getMessage();
         String[] args = message.substring(message.indexOf(" ") + 1).split(" ");
         Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
@@ -148,6 +156,8 @@ public class ChatFilterManager {
     }
 
     public void tabReceiveEvent(TabCompleteEvent e) {
+        if (!conf.contains("incoming-tab")) return;
+
         Player p = (Player) e.getSender();
         String message = e.getBuffer();
         String[] args = message.substring(message.indexOf(" ") + 1).split(" ");

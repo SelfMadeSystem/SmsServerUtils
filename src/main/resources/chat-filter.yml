@@ -12,7 +12,7 @@
 outgoing-chat:
   example: # Average Hawk flag message is:   HAWK: Username failed check. VL: 0
     check: '(msg startsWith "HAWK:") && (msg contains "VL:") && !(msg contains name)'
-    #We want that ! to invert it because we want to cancel it if its not their flag
+    #We want that ! to invert it because we want to cancel it if it is not their flag
     cancel: true # Cancel it; not their flag.
     # execute-commands: []
 

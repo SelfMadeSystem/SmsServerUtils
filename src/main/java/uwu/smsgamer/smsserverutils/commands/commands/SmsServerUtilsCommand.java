@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import uwu.smsgamer.smsserverutils.SmsServerUtils;
 import uwu.smsgamer.smsserverutils.commands.SmsCommand;
 import uwu.smsgamer.smsserverutils.config.*;
+import uwu.smsgamer.smsserverutils.managers.ChatFilterManager;
 import uwu.smsgamer.smsserverutils.utils.ChatUtils;
 
 import java.util.List;
@@ -52,6 +53,7 @@ public class SmsServerUtilsCommand extends SmsCommand {
                             for (ConfVal<?> val : ConfigManager.vals.toArray(new ConfVal<?>[0])) {
                                 ConfigManager.reloadConfVal(val);
                             }
+                            ChatFilterManager.getInstance().reload();
                             long end = System.currentTimeMillis();
                             ChatUtils.sendMessage((success ? reloadSuccess : reloadFail).getValue()
                               .replace("%ms%", String.valueOf(end-begin)), sender);
