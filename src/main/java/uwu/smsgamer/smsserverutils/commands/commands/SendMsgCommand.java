@@ -30,7 +30,7 @@ public class SendMsgCommand extends SmsCommand {
                 return true;
             }
             ChatUtils.sendMessage(String.join(" ", Arrays.copyOfRange(args, 1, args.length)), player);
-            ChatUtils.sendMessage(success.getValue().replace("%arg%", args[0]), sender);
+            ChatUtils.sendMessage(success.getValue().replace("%arg%", player.getName()), sender);
         }
         return true;
     }
