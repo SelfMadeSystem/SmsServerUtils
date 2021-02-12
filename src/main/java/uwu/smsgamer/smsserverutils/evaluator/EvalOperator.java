@@ -128,11 +128,12 @@ public class EvalOperator extends EvalToken {
             }
             this.priority = 0;
             this.returnType = types[types.length - 1];
-            this.inputTypes = Arrays.copyOfRange(types, 1, types.length - 1);
+            if (types.length > 1) this.inputTypes = Arrays.copyOfRange(types, 1, types.length - 1);
+            else this.inputTypes = new VarType[0];
             this.tokens = EvalOperatorToken.getTokensForOperator(format);
         }
 
-        FunType(Fun fun, String format, double priority, VarType returnType, VarType... inputTypes) {
+        FunType(Fun fun, String format, double priority, VarType... types) {
             this.fun = fun;
             this.format = format;
             this.keyword = format.replace(" ", "").replace("$", "");
@@ -148,8 +149,9 @@ public class EvalOperator extends EvalToken {
                 this.argsAfter = (int) split[1].chars().filter(c -> c == '$').count();
             }
             this.priority = (float) priority;
-            this.returnType = returnType;
-            this.inputTypes = inputTypes;
+            this.returnType = types[types.length - 1];
+            if (types.length > 1) this.inputTypes = Arrays.copyOfRange(types, 1, types.length - 1);
+            else this.inputTypes = new VarType[0];
             this.tokens = EvalOperatorToken.getTokensForOperator(format);
         }
 
