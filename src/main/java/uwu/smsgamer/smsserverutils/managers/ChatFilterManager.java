@@ -1,12 +1,9 @@
 package uwu.smsgamer.smsserverutils.managers;
 
-import io.github.retrooper.packetevents.event.impl.*;
-import io.github.retrooper.packetevents.packettype.PacketType;
+import io.github.retrooper.packetevents.event.impl.PacketPlaySendEvent;
 import io.github.retrooper.packetevents.packetwrappers.NMSPacket;
-import io.github.retrooper.packetevents.packetwrappers.play.in.chat.WrappedPacketInChat;
 import io.github.retrooper.packetevents.packetwrappers.play.out.chat.WrappedPacketOutChat;
 import io.github.retrooper.packetevents.utils.nms.NMSUtils;
-import io.github.retrooper.packetevents.utils.reflection.Reflection;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,21 +15,10 @@ import uwu.smsgamer.smsserverutils.config.ConfigManager;
 import uwu.smsgamer.smsserverutils.evaluator.*;
 import uwu.smsgamer.smsserverutils.utils.*;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class ChatFilterManager {
     private static ChatFilterManager instance;
-    private static Class<?> iChatBaseComponentClass;
-
-    static {
-        try {
-            iChatBaseComponentClass = NMSUtils.getNMSClass("IChatBaseComponent");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     private YamlConfiguration conf;
 
     public static ChatFilterManager getInstance() {
@@ -53,8 +39,7 @@ public class ChatFilterManager {
         if (!conf.contains("outgoing-chat")) return;
 
         WrappedPacketOutChat chat = new WrappedPacketOutChat(e.getNMSPacket());
-        String msg = getMessage(chat);
-        if (msg == null || msg.isEmpty()) msg = getMessage1(chat);
+        String msg = chat.getMessage();
 
         Evaluator evaluator = EvalUtils.newEvaluator(e.getPlayer());
         evaluator.addVar(new EvalVar.Str("msg", msg));
@@ -177,7 +162,7 @@ public class ChatFilterManager {
                         if (section.getBoolean("cancel")) e.setCancelled(true);
                         else {
                             if (section.contains("replacement"))
-                            e.setCompletions(section.getStringList("replacement"));
+                                e.setCompletions(section.getStringList("replacement"));
                         }
                     }
                     execCmd(section.getStringList("execute-commands"), args, p);
@@ -191,30 +176,7 @@ public class ChatFilterManager {
     }
 
     public static void execCmd(List<String> commands, String[] args, CommandSender player) {
-        if (commands != null) for (String s : commands) ChatUtils.execCmd(StringUtils.replaceArgsPlaceholders(s, args), player);
-    }
-
-    public String getMessage(WrappedPacketOutChat chat) {
-        final Object iChatBaseObj = chat.readObject(0, iChatBaseComponentClass);
-
-        try {
-            Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 0).invoke(iChatBaseObj);
-            return contentString.toString();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String getMessage1(WrappedPacketOutChat chat) {
-        final Object iChatBaseObj = chat.readObject(0, iChatBaseComponentClass);
-
-        try {
-            Object contentString = Reflection.getMethod(iChatBaseComponentClass, String.class, 1).invoke(iChatBaseObj);
-            return contentString.toString();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
+        if (commands != null)
+            for (String s : commands) ChatUtils.execCmd(StringUtils.replaceArgsPlaceholders(s, args), player);
     }
 }
