@@ -23,7 +23,7 @@ public class EvalUtils {
     public static Evaluator newEvaluator(OfflinePlayer player) {
         Evaluator eval = new Evaluator();
         eval.set("player", player);
-        eval.exec(scriptStart.getDVal());
+        eval.exec(scriptStart.getValue());
         return eval;
     }
 }
