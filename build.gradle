@@ -45,6 +45,8 @@ dependencies {
     runtime "mysql:mysql-connector-java:8.0.15"
 
     compile group:'org.xerial', name:'sqlite-jdbc', version:'3.8.11.2'
+
+    compile group:'org.python', name:'jython-standalone', version:'2.7.2'
 }
 
 processResources {

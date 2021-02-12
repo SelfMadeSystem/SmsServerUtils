@@ -22,6 +22,8 @@ public class Loader extends JavaPlugin {
           .addDependency(new Dependency(Repository.JITPACK,
             "com.github.retrooper", "packetevents", "v1.8-pre-4"))
           .addDependency(new Dependency(Repository.MAVENCENTRAL,
+            "org.python", "jython-standalone", "2.7.2"))
+          .addDependency(new Dependency(Repository.MAVENCENTRAL,
             "org.xerial", "sqlite-jdbc", "3.8.11.2"))
           .loadDependencies();
 

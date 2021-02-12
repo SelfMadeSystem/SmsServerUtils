@@ -5,7 +5,6 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import uwu.smsgamer.smsserverutils.commands.SmsCommand;
 import uwu.smsgamer.smsserverutils.config.ConfVal;
-import uwu.smsgamer.smsserverutils.evaluator.Evaluator;
 import uwu.smsgamer.smsserverutils.utils.*;
 
 import java.util.*;

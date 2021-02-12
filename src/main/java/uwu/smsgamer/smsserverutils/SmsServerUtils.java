@@ -9,7 +9,7 @@ import uwu.smsgamer.smsserverutils.commands.CommandManager;
 import uwu.smsgamer.smsserverutils.config.ConfigManager;
 import uwu.smsgamer.smsserverutils.listener.*;
 import uwu.smsgamer.smsserverutils.managers.ChatFilterManager;
-import uwu.smsgamer.smsserverutils.utils.ChatUtils;
+import uwu.smsgamer.smsserverutils.utils.*;
 
 public final class SmsServerUtils {
     private static SmsServerUtils INSTANCE;
@@ -54,7 +54,7 @@ public final class SmsServerUtils {
     }
 
     public void onEnable() {
-        ConfigManager.setup("messages", "chat-filter");
+        ConfigManager.setup("messages", "chat-filter", "py-settings");
 
         //Initiate PacketEvents
         PacketEvents.get().init(plugin);
@@ -73,12 +73,14 @@ public final class SmsServerUtils {
 
         ChatFilterManager.getInstance();
         ChatUtils.init();
+        EvalUtils.init();
 
         CommandManager.setupCommands();
 
         Bukkit.getPluginManager().registerEvents(BukkitListener.getInstance(), plugin);
 
         ConfigManager.saveConfig("messages");
+        ConfigManager.saveConfig("py-settings");
     }
 
     public void onDisable() {

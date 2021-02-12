@@ -16,19 +16,16 @@ public class BukkitListener implements Listener {
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
-        System.out.println(e.getMessage());
         ChatFilterManager.getInstance().commandReceiveEvent(e);
     }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
-        System.out.println(e.getMessage());
         ChatFilterManager.getInstance().chatReceiveEvent(e);
     }
 
     @EventHandler
     public void onTab(TabCompleteEvent e) {
-        System.out.println(e.getBuffer());
         if (e.getSender() instanceof Player) ChatFilterManager.getInstance().tabReceiveEvent(e);
     }
 }

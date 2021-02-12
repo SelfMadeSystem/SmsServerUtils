@@ -1,4 +1,4 @@
-# Built in variables:
+# Built in variables for chat-filter:
 # msg - The message being sent to or received from the player
 # name - The player's name.
 #
@@ -6,23 +6,21 @@
 # placeholders, obviously replacing the `papi-placeholders` part with
 # the actual placeholder. For example: %player-name%
 #
-# For full use on the evaluator system, please check the docs at:
-# https://github.com/True-cc/SmsServerUtils/wiki/Evaluator
+### SWITCHED TO JYTHON ###
 
 outgoing-chat:
   example: # Average Hawk flag message is:   HAWK: Username failed check. VL: 0
-    check: '(msg startsWith "HAWK:") && (msg contains "VL:") && !(msg contains name)'
-    #We want that ! to invert it because we want to cancel it if it is not their flag
+    check: 'msg.startswith("HAWK:") and ("VL:" in msg) and not (player.getName() in msg)'
+    #We want that  not  to invert it because we want to cancel it if it is not their flag
     cancel: true # Cancel it; not their flag.
     # execute-commands: []
 
   example2: # Average Hawk notif message is:   HAWK: Username failed check. VL: 0
-    check: '(msg startsWith "HAWK:") && (msg contains "VL:") && !(msg contains name)'
-    #We want that ! to invert it because we want to cancel it if its not their flag
+    check: 'msg.startswith("HAWK:") and "VL:" in msg and player.getName() in msg'
+    #We want that  not  to invert it because we want to cancel it if its not their flag
     cancel: false # Don't cancel; it is their flag.
-    replacement: '"&cOwO:&7 " s+ name s+ " failed: " s+ (msg substr ((msg indexOf " failed ") + 8)
-    (msg indexOf ".")) s+ " with VL: "
-    s+ (msg substrr ((msg indexOf "VL:") + 4)) s+ "&a %player_x% %player_y% %player_z%"'
+    replacement: '"&cOwO:&7 " + player.getName() + " failed: " + msg[msg.find(" failed ") + 8:msg.find(".")] + " with VL: "
+    + msg[msg.find("VL:") + 4:] + "&a %player_x% %player_y% %player_z%"'
     is-json: false # Not json.
     # execute-commands: []
 
@@ -43,7 +41,7 @@ outgoing-chat:
 # These are replaced both in strings and as variables.
 incoming-command:
   example:
-    check: '(label equalsIc "/pl") || (msg startsWith "/ver ") || (msg startsWith "/version ")'
+    check: '(label.lower() == "/pl") or (msg.lower() == "/ver ") or (msg.lower() == "/version ")'
     cancel: true
     # No evaluator, but still going through PAPI and the preprocessor. (papi first tho)
     send-msg: '%prefix% &cDon''t get our plugins; thx. Command: %msg% Label: %label%'
@@ -53,16 +51,16 @@ incoming-command:
 # Same rules as incoming-command apply here.
 incoming-chat:
   example2:
-    check: '!(label startsWith "/")'
+    check: 'not (label.startswith("/"))'
     cancel: false
     # PAPI and coloring are not done after the executor is finished.
-    replacement: 'msg replace name (color ("&6&l" s+ name s+ "&r"))'
+    replacement: 'msg.replace(player.getName(), color("&6&l" + player.getName() + "&r"))'
     # execute-commands: []
 
 # For the arg
 incoming-tab:
   example:
-    check: '(label equalsIc "/") || (label equalsIc "/ver") || (label equalsIc "/version")'
+    check: '(label.lower() == "/") or (label.lower() == "/ver") or (label.lower() == "/version")'
     cancel: false
     # List of stuff. PAPI and colored
     replacement:
