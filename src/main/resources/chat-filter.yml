@@ -7,7 +7,7 @@
 # the actual placeholder. For example: %player-name%
 #
 # For full use on the evaluator system, please check the docs at:
-# <link here>
+# https://github.com/True-cc/SmsServerUtils/wiki/Evaluator
 
 outgoing-chat:
   example: # Average Hawk flag message is:   HAWK: Username failed check. VL: 0
